@@ -1,16 +1,14 @@
 package io.github.awidesky.liivQuizCrawler;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Main {
 
 	private static boolean debug = false;
-	private static String[] oneLiner = new String[3];
+	private static Object[] oneLiner = new String[3];
 	
 	public static void main(String[] args) {
 		final String today = new SimpleDateFormat("M월 d일").format(new Date());
@@ -35,7 +33,8 @@ public class Main {
 		oneLiner[2] = arr[1];
 		
 		System.out.println("\n");
-		System.out.println(Arrays.stream(oneLiner).collect(Collectors.joining("    ")));
+		System.out.printf("신한 %s  %s 리브 %s", oneLiner);
+		System.out.println();
 	}
 	
 	static String[] find_quiz(String title, int n) {
