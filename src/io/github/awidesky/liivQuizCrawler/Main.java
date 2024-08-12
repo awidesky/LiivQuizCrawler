@@ -2,8 +2,10 @@ package io.github.awidesky.liivQuizCrawler;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 public class Main {
 
@@ -37,11 +39,12 @@ public class Main {
 		System.out.println();
 	}
 	
-	static String[] find_quiz(String title, int n) {
-		String[] html = HTML.getText("https://www.bntnews.co.kr/article/list/bnt005005000");
+	private static final String newsList = "https://www.bntnews.co.kr/article/list/bnt005005000"; 
+	private static String[] find_quiz(String title, int n) {
+		String[] html = HTML.getText(newsList);
 		
-		int ii = 0;
-		while(!html[ii].contains(title)) ii++;
+		int ii = search(html, s -> s.contains(title));
+		if(ii == -1) throw new RuntimeException("Cannot find \"" + title + "\"" + " from " + newsList);
 		printSurroundings(html, ii);
 		Pattern pattern = Pattern.compile("(/article/view/bnt\\d+)");
 		Matcher matcher = pattern.matcher(html[ii - 1]);
@@ -54,15 +57,10 @@ public class Main {
 		html = HTML.getText(sol);
 		/* find title */
 		Pattern titlePattern = Pattern.compile("<title>(.*?)</title>");
-		int t = 0;
-		while(true) {
-			matcher = titlePattern.matcher(html[t]);
-			t++;
-			if(matcher.find()) {
-				System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip());
-				break;
-			}
-		}
+		int t = search(html, s -> titlePattern.matcher(s).find());
+		if(t == -1) throw new RuntimeException("Cannot find <title> from " + sol);
+		titlePattern.matcher(html[t]).find();
+		System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip());
 		
 		/* find quiz answer */
 		pattern = Pattern.compile("(<strong>(.+?)</strong>)");
@@ -79,8 +77,14 @@ public class Main {
 		}
 		return ret;
 	}
+	
+	private static int search(String[] arr, Predicate<String> pred) {
+		return IntStream.range(0, arr.length)
+				   .filter(i -> pred.test(arr[i]))
+				   .findFirst().orElse(-1);
+	}
 
-	static void printSurroundings(String[] arr, int idx) {
+	private static void printSurroundings(String[] arr, int idx) {
 		if(!debug) return;
 		
 		int i = Math.max(idx - 5, 0);
