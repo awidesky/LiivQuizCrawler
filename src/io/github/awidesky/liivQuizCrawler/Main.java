@@ -35,7 +35,7 @@ public class Main {
 		oneLiner[2] = arr[1];
 		
 		System.out.println("\n");
-		System.out.printf("신한 %s  %s 리브 %s", oneLiner);
+		System.out.printf("신한 \"%s\"  \"%s\"  리브 \"%s\"", oneLiner);
 		System.out.println();
 	}
 	
