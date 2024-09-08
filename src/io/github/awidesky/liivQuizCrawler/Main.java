@@ -59,7 +59,8 @@ public class Main {
 		Pattern titlePattern = Pattern.compile("<title>(.*?)</title>");
 		int t = search(html, s -> titlePattern.matcher(s).find());
 		if(t == -1) throw new RuntimeException("Cannot find <title> from " + sol);
-		titlePattern.matcher(html[t]).find();
+		matcher = titlePattern.matcher(html[t]);
+		matcher.find();
 		System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip());
 		
 		/* find quiz answer */
