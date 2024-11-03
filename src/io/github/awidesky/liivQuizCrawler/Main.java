@@ -1,6 +1,7 @@
 package io.github.awidesky.liivQuizCrawler;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -18,15 +19,15 @@ public class Main {
 		String[] arr = find_quiz("쏠퀴즈", 7);
 		for (int i = 1; i < arr.length; i++) {
 			if(arr[i].contains("퀴즈팡팡")) {
-				i++;
 				continue;
 			}
-			if (i % 2 == 0) {
-				System.out.println(arr[i]);
-				oneLiner[arr[i - 1].contains("출석퀴즈") ? 0 : 1] = arr[i];
+			if (arr[i].contains("출석퀴즈")) {
+				System.out.printf("%s : %s\n", arr[i], arr[i + 1]);
+				oneLiner[0] = arr[i + 1];
+			} else if (arr[i].contains("쏠퀴즈")) {
+				System.out.printf("%s : %s\n", arr[i], arr[i + 1]);
+				oneLiner[1] = arr[i + 1];
 			}
-			else
-				System.out.print(arr[i] + " : ");
 		}
 		
 		System.out.println();
@@ -61,18 +62,25 @@ public class Main {
 		if(t == -1) throw new RuntimeException("Cannot find <title> from " + sol);
 		matcher = titlePattern.matcher(html[t]);
 		matcher.find();
-		System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip());
+		System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
 		
 		/* find quiz answer */
 		pattern = Pattern.compile("(<strong>(.+?)</strong>)");
 		int j = 0;
-		String[] ret = new String[n];
+		String[] ret = new String[n]; Arrays.fill(ret, "");
 		for(int i = 0; i < n;) {
-			matcher = pattern.matcher(html[j++]);
+			try {
+				matcher = pattern.matcher(html[j++]);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				System.out.println("Cannot find pattern more than " + i + "(" + n + "expected): \"" + pattern.pattern() + "\" from " + title);
+				//Arrays.stream(html).forEach(System.out::println);
+				break;
+			}
 			if(!matcher.find()) continue;
 			
 			do {
 				ret[i] = matcher.group(2).strip();
+				debug("ret[" + i + "] : " + ret[i]);
 				i++;
 			} while (matcher.find());
 		}
