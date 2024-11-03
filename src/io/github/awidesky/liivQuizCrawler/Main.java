@@ -14,6 +14,8 @@ public class Main {
 	private static Object[] oneLiner = new String[3];
 	
 	public static void main(String[] args) {
+		debug = Arrays.stream(args).anyMatch("--debug"::equals);
+		
 		final String today = new SimpleDateFormat("M월 d일").format(new Date());
 		debug("Today : " + today);
 		String[] arr = find_quiz("쏠퀴즈", 7);
