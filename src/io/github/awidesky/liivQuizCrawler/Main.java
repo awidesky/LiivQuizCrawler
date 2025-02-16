@@ -3,6 +3,7 @@ package io.github.awidesky.liivQuizCrawler;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,7 +68,7 @@ public class Main {
 		System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
 		
 		/* find quiz answer */
-		pattern = Pattern.compile("(<strong>(.+?)</strong>)");
+		pattern = Pattern.compile("((<strong>(.+?)</strong>)|(<b>(.+?)</b>))");
 		int j = 0;
 		String[] ret = new String[n]; Arrays.fill(ret, "");
 		for(int i = 0; i < n;) {
@@ -81,7 +82,7 @@ public class Main {
 			if(!matcher.find()) continue;
 			
 			do {
-				ret[i] = matcher.group(2).strip();
+				ret[i] = Optional.ofNullable(matcher.group(3)).orElse(matcher.group(5)).strip();
 				debug("ret[" + i + "] : " + ret[i]);
 				i++;
 			} while (matcher.find());
