@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 public class Main {
 
 	private static boolean debug = false;
-	private static Object[] oneLiner = new String[3];
+	private static Object[] oneLiner = new String[4];
 	
 	public static void main(String[] args) {
 		debug = Arrays.stream(args).anyMatch("--debug"::equals);
@@ -37,9 +37,12 @@ public class Main {
 		arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
 		System.out.println(arr[0] + " : " + arr[1]);
 		oneLiner[2] = arr[1];
+
+		System.out.println();
+		oneLiner[3] = Tstory.getHanaQuizAnswer(today);
 		
 		System.out.println("\n");
-		System.out.printf("신한 \"%s\"  \"%s\"  리브 \"%s\"", oneLiner);
+		System.out.printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"", oneLiner);
 		System.out.println();
 	}
 	
