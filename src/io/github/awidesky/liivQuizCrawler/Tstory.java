@@ -1,5 +1,7 @@
 package io.github.awidesky.liivQuizCrawler;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,22 +24,29 @@ public class Tstory {
 			Matcher m = p.matcher(s);
 			if(m.find()) return m.group(1);
 			else return null;
-		}) + " : " + link);
+		}) + " : " + encodeURL(link));
 		String ret = getQuizAnswer(link);
 		System.out.println(title + " : " + ret);
 		return ret;
 		
 	}
 	
+	private static String encodeURL(String link) {
+		return URLDecoder.decode(link, StandardCharsets.UTF_8);
+	}
+	
 	private static String getQuizlink(String title) {
 		Pattern linkPattern  = Pattern.compile(".*\"item\":\\{\"@id\":\"(.*?)\",\"name\":\"" + title);
-		return HTML.getTextFilterFirst(list, s -> {
+		return HTML.getTextFilterFirstOptional(list, s -> {
 			Matcher m = linkPattern.matcher(s);
 			if(m.find()) {
 				return m.group(1);
 			} else {
 				return null;
 			}
+		}).orElseGet(() -> {
+			System.out.println("Cannot find \"" + title + "\" from : " + list);
+			return null;
 		});
 	}
 	
@@ -49,7 +58,8 @@ public class Tstory {
 			if(titlePattern.matcher(html[i]).find()) {
 				Matcher matcher = pattern.matcher(html[i]);
 				if(matcher.find() && matcher.find()) {
-					return Optional.ofNullable(matcher.group(3)).orElse(matcher.group(5)).strip();
+					Main.debug("Found tag : " + matcher.group(0));
+					return Optional.ofNullable(matcher.group(3)).orElse(matcher.group(5)).replaceAll("<(.*?)>", "").strip();
 				} else {
 					System.out.println("Cannot find " + pattern + " after find " + titlePattern);
 					for(int j = i - 10; j < i + 10; j++)

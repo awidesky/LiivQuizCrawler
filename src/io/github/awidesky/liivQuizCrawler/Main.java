@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 public class Main {
 
 	private static boolean debug = false;
-	private static Object[] oneLiner = new String[4];
+	private static Object[] oneLiner = new String[5];
 	
 	public static void main(String[] args) {
 		debug = Arrays.stream(args).anyMatch("--debug"::equals);
@@ -41,8 +41,11 @@ public class Main {
 		System.out.println();
 		oneLiner[3] = Tstory.getHanaQuizAnswer(today);
 		
+		System.out.println();
+		oneLiner[4] = Tstory.getKBQuizAnswer(today);
+		
 		System.out.println("\n");
-		System.out.printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"", oneLiner);
+		System.out.printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"", oneLiner);
 		System.out.println();
 	}
 	
