@@ -51,49 +51,54 @@ public class Main {
 	
 	private static final String newsList = "https://www.bntnews.co.kr/article/list/bnt005005000"; 
 	private static String[] find_quiz(String title, int n) {
-		String[] html = HTML.getText(newsList);
-		
-		int ii = search(html, s -> s.contains(title));
-		if(ii == -1) throw new RuntimeException("Cannot find \"" + title + "\"" + " from " + newsList);
-		printSurroundings(html, ii);
-		Pattern pattern = Pattern.compile("(/article/view/bnt\\d+)");
-		Matcher matcher = pattern.matcher(html[ii - 1]);
-		while (!matcher.find()) {
-			matcher = pattern.matcher(html[(--ii) - 1]);
-		}
-		String sol = "https://www.bntnews.co.kr" + matcher.group(1);
-		debug("Found quiz link : " + sol);
-
-		html = HTML.getText(sol);
-		/* find title */
-		Pattern titlePattern = Pattern.compile("<title>(.*?)</title>");
-		int t = search(html, s -> titlePattern.matcher(s).find());
-		if(t == -1) throw new RuntimeException("Cannot find <title> from " + sol);
-		matcher = titlePattern.matcher(html[t]);
-		matcher.find();
-		System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
-		
-		/* find quiz answer */
-		pattern = Pattern.compile("((<strong>(.+?)</strong>)|(<b>(.+?)</b>))");
-		int j = 0;
-		String[] ret = new String[n]; Arrays.fill(ret, "");
-		for(int i = 0; i < n;) {
-			try {
-				matcher = pattern.matcher(html[j++]);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				System.out.println("Cannot find pattern more than " + i + "(" + n + "expected): \"" + pattern.pattern() + "\" from " + title);
-				//Arrays.stream(html).forEach(System.out::println);
-				break;
-			}
-			if(!matcher.find()) continue;
+		try {
+			String[] html = HTML.getText(newsList);
 			
-			do {
-				ret[i] = Optional.ofNullable(matcher.group(3)).orElse(matcher.group(5)).strip();
-				debug("ret[" + i + "] : " + ret[i]);
-				i++;
-			} while (matcher.find());
+			int ii = search(html, s -> s.contains(title));
+			if(ii == -1) throw new RuntimeException("Cannot find \"" + title + "\"" + " from " + newsList);
+			printSurroundings(html, ii);
+			Pattern pattern = Pattern.compile("(/article/view/bnt\\d+)");
+			Matcher matcher = pattern.matcher(html[ii - 1]);
+			while (!matcher.find()) {
+				matcher = pattern.matcher(html[(--ii) - 1]);
+			}
+			String sol = "https://www.bntnews.co.kr" + matcher.group(1);
+			debug("Found quiz link : " + sol);
+
+			html = HTML.getText(sol);
+			/* find title */
+			Pattern titlePattern = Pattern.compile("<title>(.*?)</title>");
+			int t = search(html, s -> titlePattern.matcher(s).find());
+			if(t == -1) throw new RuntimeException("Cannot find <title> from " + sol);
+			matcher = titlePattern.matcher(html[t]);
+			matcher.find();
+			System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
+			
+			/* find quiz answer */
+			pattern = Pattern.compile("((<strong>(.+?)</strong>)|(<b>(.+?)</b>))");
+			int j = 0;
+			String[] ret = new String[n]; Arrays.fill(ret, "");
+			for(int i = 0; i < n;) {
+				try {
+					matcher = pattern.matcher(html[j++]);
+				} catch (ArrayIndexOutOfBoundsException e) {
+					System.out.println("Cannot find pattern more than " + i + "(" + n + "expected): \"" + pattern.pattern() + "\" from " + title);
+					//Arrays.stream(html).forEach(System.out::println);
+					break;
+				}
+				if(!matcher.find()) continue;
+				
+				do {
+					ret[i] = Optional.ofNullable(matcher.group(3)).orElse(matcher.group(5)).strip();
+					debug("ret[" + i + "] : " + ret[i]);
+					i++;
+				} while (matcher.find());
+			}
+			return ret;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new String[n];
 		}
-		return ret;
 	}
 	
 	private static int search(String[] arr, Predicate<String> pred) {
