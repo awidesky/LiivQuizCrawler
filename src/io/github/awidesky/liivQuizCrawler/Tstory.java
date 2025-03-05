@@ -5,10 +5,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 public class Tstory {
 
-	private static final String list = "https://bookshelf-journey.tistory.com/category";
+	private static final String listLink = "https://bookshelf-journey.tistory.com/category";
 	
 	public static String getHanaQuizAnswer(String today) {
 		return getQuiz("하나원큐 축구Play 퀴즈HANA", today);
@@ -37,19 +38,24 @@ public class Tstory {
 	
 	private static String getQuizlink(String title) {
 		Pattern linkPattern  = Pattern.compile(".*\"item\":\\{\"@id\":\"(.*?)\",\"name\":\"" + title);
-		return HTML.getTextFilterFirstOptional(list, s -> {
+
+		return IntStream.range(1, 5).mapToObj(i -> findPatternFromList(listLink + "?page=" + i, linkPattern))
+				.filter(Optional::isPresent).map(Optional::get).findFirst().orElseGet(() -> {
+					System.out.println("Cannot find \"" + title + "\" from : " + listLink);
+					return null;
+				});
+	}
+	
+	private static Optional<String> findPatternFromList(String link, Pattern linkPattern) {
+		return HTML.getTextFilterFirstOptional(link, s -> {
 			Matcher m = linkPattern.matcher(s);
 			if(m.find()) {
 				return m.group(1);
 			} else {
 				return null;
 			}
-		}).orElseGet(() -> {
-			System.out.println("Cannot find \"" + title + "\" from : " + list);
-			return null;
 		});
 	}
-	
 	private static String getQuizAnswer(String link) {
 		String[] html = HTML.getText(link);
 		Pattern titlePattern = Pattern.compile("^<blockquote(.*?)<b>(\\s*)퀴즈 정답(\\s*)</b>");
@@ -59,7 +65,8 @@ public class Tstory {
 				Matcher matcher = pattern.matcher(html[i]);
 				if(matcher.find() && matcher.find()) {
 					Main.debug("Found tag : " + matcher.group(0));
-					return Optional.ofNullable(matcher.group(3)).orElse(matcher.group(5)).replaceAll("<(.*?)>", "").strip();
+					return Optional.ofNullable(matcher.group(3)).orElse(matcher.group(5))
+								.replaceAll("(<(.*?)>)", "").replaceAll("[\\[\\]]", "").strip();
 				} else {
 					System.out.println("Cannot find " + pattern + " after find " + titlePattern);
 					for(int j = i - 10; j < i + 10; j++)
