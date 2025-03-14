@@ -58,20 +58,21 @@ public class Tstory {
 	}
 	private static String getQuizAnswer(String link) {
 		String[] html = HTML.getText(link);
-		Pattern titlePattern = Pattern.compile("^<blockquote(.*?)<b>(\\s*)퀴즈 정답(\\s*)</b>");
-		Pattern pattern = Pattern.compile("((<strong>(.+?)</strong>)|(<b>(.+?)</b>))");
+		Pattern titlePattern = Pattern.compile("^<blockquote(.*?)>((<b>(\\s*)퀴즈 정답(\\s*)</b>)|(<span(.*?)>(\\s*)퀴즈 정답(\\s*)</span>))(.*?)</blockquote>");
+		Pattern pattern = Pattern.compile("((<b>(.+?)</b>)|(<span(.*?)>(.+?)</span>))");
 		for(int i = 0; i < html.length; i++) {
-			if(titlePattern.matcher(html[i]).find()) {
+			Matcher tm = titlePattern.matcher(html[i]);
+			if(tm.find()) {
 				Matcher matcher = pattern.matcher(html[i]);
 				if(matcher.find() && matcher.find()) {
 					Main.debug("Found tag : " + matcher.group(0));
-					return Optional.ofNullable(matcher.group(3)).orElse(matcher.group(5))
+					return Optional.ofNullable(matcher.group(3)).orElse(matcher.group(6))
 								.replaceAll("(<(.*?)>)", "").replaceAll("[\\[\\]]", "").strip();
 				} else {
 					System.out.println("Cannot find " + pattern + " after find " + titlePattern);
 					for(int j = i - 10; j < i + 10; j++)
 						if(0 <= j && j < html.length) Main.debug("[" + j + "] " + html[j]);
-					return null;
+					return tm.group(10).replaceAll("<(.*?)>", "");
 				}
 			}
 		}
