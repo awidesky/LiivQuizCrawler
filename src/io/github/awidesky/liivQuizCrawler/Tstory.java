@@ -72,7 +72,7 @@ public class Tstory {
 					System.out.println("Cannot find " + pattern + " after find " + titlePattern);
 					for(int j = i - 10; j < i + 10; j++)
 						if(0 <= j && j < html.length) Main.debug("[" + j + "] " + html[j]);
-					return tm.group(10).replaceAll("<(.*?)>", "");
+					return tm.group(10).replaceAll("<(.*?)>", "").strip();
 				}
 			}
 		}
