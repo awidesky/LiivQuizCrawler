@@ -13,7 +13,6 @@ import java.util.function.Function;
 public class HTML {
 	public static String[] getText(String url) {
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new URL(url).openConnection().getInputStream()))) {
- 
             String inputLine;
             List<String> l = new LinkedList<>();
             while ((inputLine = br.readLine()) != null) {

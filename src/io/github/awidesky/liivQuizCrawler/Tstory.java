@@ -20,13 +20,17 @@ public class Tstory {
 
 	private static String getQuiz(String title, String today) {
 		String link = getQuizlink("\\[" + title + "\\] " + today);
-		System.out.println(HTML.getTextFilterFirst(link, s -> {
-			Pattern p = Pattern.compile("<title>(.*?)</title>");
-			Matcher m = p.matcher(s);
-			if(m.find()) return m.group(1);
-			else return null;
-		}) + " : " + encodeURL(link));
-		String ret = getQuizAnswer(link);
+		String ret = null;
+		
+		if(link != null) {
+			System.out.println(HTML.getTextFilterFirst(link, s -> {
+				Pattern p = Pattern.compile("<title>(.*?)</title>");
+				Matcher m = p.matcher(s);
+				if(m.find()) return m.group(1);
+				else return null;
+			}) + " : " + encodeURL(link));
+			ret = getQuizAnswer(link);
+		}
 		System.out.println(title + " : " + ret);
 		return ret;
 		
