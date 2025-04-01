@@ -17,6 +17,9 @@ public class Tstory {
 	public static String getKBQuizAnswer(String today) {
 		return getQuiz("KB 스타뱅킹 스타퀴즈", today);
 	}
+	public static String getKBPayQuizAnswer(String today) {
+		return getQuiz("KB Pay 오늘의 퀴즈", today);
+	}
 
 	private static String getQuiz(String title, String today) {
 		String link = getQuizlink("\\[" + title + "\\] " + today);

@@ -35,8 +35,12 @@ public class Main {
 		
 		System.out.println();
 		arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
-		System.out.println(arr[0] + " : " + arr[1]);
-		oneLiner[2] = arr[1];
+		if(arr != null) {
+			System.out.println(arr[0] + " : " + arr[1]);
+			oneLiner[2] = arr[1];
+		} else {
+			oneLiner[2] = Tstory.getKBPayQuizAnswer(today);
+		}
 
 		System.out.println();
 		oneLiner[3] = Tstory.getHanaQuizAnswer(today);
@@ -97,7 +101,7 @@ public class Main {
 			return ret;
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new String[n];
+			return null;
 		}
 	}
 	
