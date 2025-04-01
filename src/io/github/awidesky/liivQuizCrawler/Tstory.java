@@ -20,6 +20,12 @@ public class Tstory {
 	public static String getKBPayQuizAnswer(String today) {
 		return getQuiz("KB Pay 오늘의 퀴즈", today);
 	}
+	public static String getSOLQuizAnswer(String today) {
+		return getQuiz("신한 슈퍼 SOL 출석 퀴즈", today);
+	}
+	public static String getSOLBaseballQuizAnswer(String today) {
+		return getQuiz("신한 슈퍼 SOL 야구/상식 쏠퀴즈", today);
+	}
 
 	private static String getQuiz(String title, String today) {
 		String link = getQuizlink("\\[" + title + "\\] " + today);

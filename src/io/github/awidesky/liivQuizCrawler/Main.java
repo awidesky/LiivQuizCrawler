@@ -20,17 +20,25 @@ public class Main {
 		final String today = new SimpleDateFormat("M월 d일").format(new Date());
 		debug("Today : " + today);
 		String[] arr = find_quiz("쏠퀴즈", 7);
-		for (int i = 1; i < arr.length; i++) {
-			if(arr[i].contains("퀴즈팡팡")) {
-				continue;
+		if(arr != null) {
+			for (int i = 1; i < arr.length; i++) {
+				if(arr[i].contains("퀴즈팡팡")) {
+					continue;
+				}
+				if (arr[i].contains("출석퀴즈")) {
+					System.out.printf("%s : %s\n", arr[i], arr[i + 1]);
+					oneLiner[0] = arr[i + 1];
+				} else if (arr[i].contains("쏠퀴즈")) {
+					System.out.printf("%s : %s\n", arr[i], arr[i + 1]);
+					oneLiner[1] = arr[i + 1];
+				}
 			}
-			if (arr[i].contains("출석퀴즈")) {
-				System.out.printf("%s : %s\n", arr[i], arr[i + 1]);
-				oneLiner[0] = arr[i + 1];
-			} else if (arr[i].contains("쏠퀴즈")) {
-				System.out.printf("%s : %s\n", arr[i], arr[i + 1]);
-				oneLiner[1] = arr[i + 1];
-			}
+		}
+		if(oneLiner[0] == null) {
+			oneLiner[0] = Tstory.getSOLQuizAnswer(today);
+		}
+		if(oneLiner[1] == null) {
+			oneLiner[1] = Tstory.getSOLBaseballQuizAnswer(today);
 		}
 		
 		System.out.println();
