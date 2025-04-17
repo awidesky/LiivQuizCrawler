@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,7 +16,24 @@ public class Main {
 	private static Object[] oneLiner = new String[5];
 	
 	public static void main(String[] args) {
-		debug = Arrays.stream(args).anyMatch("--debug"::equals);
+
+		for(int i = 0; i < args.length; i++) {
+			if("--getText".equals(args[i])) {
+				String link;
+				if(i < args.length) link = args[i + 1];
+				else {
+					System.out.print("Enter link to print > ");
+					Scanner sc = new Scanner(System.in);
+					link = sc.nextLine();
+					sc.close();
+				}
+				for(String s : HTML.getText(link)) System.out.println(s);
+				return;
+			} else if ("--debug".equals(args[i])) {
+				debug = true;
+			}
+		}
+		
 		
 		final String today = new SimpleDateFormat("M월 d일").format(new Date());
 		debug("Today : " + today);
