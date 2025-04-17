@@ -38,6 +38,7 @@ public class Tstory {
 				if(m.find()) return m.group(1);
 				else return null;
 			}) + " : " + encodeURL(link));
+			Main.debug("Raw url : " + link);
 			ret = getQuizAnswer(link);
 		}
 		System.out.println(title + " : " + ret);
@@ -72,14 +73,15 @@ public class Tstory {
 	private static String getQuizAnswer(String link) {
 		String[] html = HTML.getText(link);
 		Pattern titlePattern = Pattern.compile("^<blockquote(.*?)>((<b>(\\s*)퀴즈 정답(\\s*)</b>)|(<span(.*?)>(\\s*)퀴즈 정답(\\s*)</span>))(.*?)</blockquote>");
-		Pattern pattern = Pattern.compile("((<b>(.+?)</b>)|(<span(.*?)>(.+?)</span>))");
+		Pattern pattern = Pattern.compile("(<span(.*?)>(.+?)</span>)");
 		for(int i = 0; i < html.length; i++) {
 			Matcher tm = titlePattern.matcher(html[i]);
 			if(tm.find()) {
 				Matcher matcher = pattern.matcher(html[i]);
+				Main.debug("Found line : " + tm.group(0));
 				if(matcher.find() && matcher.find()) {
 					Main.debug("Found tag : " + matcher.group(0));
-					return Optional.ofNullable(matcher.group(3)).orElse(matcher.group(6))
+					return Optional.ofNullable(matcher.group(3)).get()
 								.replaceAll("(<(.*?)>)", "").replaceAll("[\\[\\]]", "").strip();
 				} else {
 					System.out.println("Cannot find " + pattern + " after find " + titlePattern);
