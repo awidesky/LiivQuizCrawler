@@ -72,7 +72,7 @@ public class Tstory {
 	}
 	private static String getQuizAnswer(String link) {
 		String[] html = HTML.getText(link);
-		Pattern titlePattern = Pattern.compile("^<blockquote(.*?)>((<b>(\\s*)퀴즈 정답(\\s*)</b>)|(<span(.*?)>(\\s*)퀴즈 정답(\\s*)</span>))(.*?)</blockquote>");
+		Pattern titlePattern = Pattern.compile("^<blockquote(.*?)>((<b>(\\s*)퀴즈\\s*정답(\\s*)</b>)|(<span(.*?)>(\\s*)퀴즈\\s*정답(\\s*)</span>))(.*?)</blockquote>");
 		Pattern pattern = Pattern.compile("(<span(.*?)>(.+?)</span>)");
 		for(int i = 0; i < html.length; i++) {
 			Matcher tm = titlePattern.matcher(html[i]);
