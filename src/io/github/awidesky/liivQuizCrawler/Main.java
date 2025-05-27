@@ -60,12 +60,13 @@ public class Main {
 		}
 		
 		System.out.println();
-		arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
-		if(arr != null) {
-			System.out.println(arr[0] + " : " + arr[1]);
-			oneLiner[2] = arr[1];
-		} else {
-			oneLiner[2] = Tstory.getKBPayQuizAnswer(today);
+		oneLiner[2] = Tstory.getKBPayQuizAnswer(today);
+		if (oneLiner[2] == null) {
+			arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
+			if (arr != null) {
+				System.out.println(arr[0] + " : " + arr[1]);
+				oneLiner[2] = arr[1];
+			}
 		}
 
 		System.out.println();
