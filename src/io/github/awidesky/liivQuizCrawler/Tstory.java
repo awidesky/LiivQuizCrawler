@@ -2,6 +2,7 @@ package io.github.awidesky.liivQuizCrawler;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,8 +43,16 @@ public class Tstory {
 			ret = getQuizAnswer(link);
 		}
 		System.out.println(title + " : " + ret);
-		return ret;
+		return replaceChar(ret);
 		
+	}
+	
+	private static Map<String, String> replace = Map.of("①", "1.", "②", "2.", "③", "3.", "④", "4.", "⑤", "5.");
+	private static String replaceChar(String str) {
+		for(Map.Entry<String, String> e : replace.entrySet()) {
+			str = str.replace(e.getKey(), e.getValue());
+		}
+		return str;
 	}
 	
 	private static String encodeURL(String link) {
