@@ -42,7 +42,7 @@ public class Tstory {
 			Main.debug("Raw url : " + link);
 			ret = getQuizAnswer(link);
 		}
-		System.out.println(title + " : " + ret);
+		System.out.println(title + " : " + ret); //TODO : this might be null
 		return replaceChar(ret);
 		
 	}
@@ -93,15 +93,27 @@ public class Tstory {
 					return Optional.ofNullable(matcher.group(3)).get()
 								.replaceAll("(<(.*?)>)", "").replaceAll("[\\[\\]]", "").strip();
 				} else {
-					System.out.println("Cannot find " + pattern + " after find " + titlePattern);
+					System.out.println("Cannot find content " + pattern + " after finding " + titlePattern);
 					for(int j = i - 10; j < i + 10; j++)
 						if(0 <= j && j < html.length) Main.debug("[" + j + "] " + html[j]);
 					return tm.group(10).replaceAll("<(.*?)>", "").strip();
 				}
 			}
 		}
-		System.out.println("Cannot find " + titlePattern);
-		return null;
+		System.out.println("Cannot find title " + titlePattern);
+		String ret = null;
+		System.out.println("Possible answer :");
+		Pattern puntPattern = Pattern.compile("(.*)퀴즈\\s*정답(.{1,30})(.*)");
+		for(int i = 0; i < html.length; i++) {
+			Matcher m = puntPattern.matcher(html[i]);
+			if(m.find()) {
+				String str = m.group(2).strip();
+				if(ret == null && replace.keySet().stream().anyMatch(str::contains))
+					ret = str.replaceAll("\\s*앱테크 포인트 모으기.*", "");
+				System.out.println(str);
+			}
+		}
+		return ret;
 	}
 
 }
