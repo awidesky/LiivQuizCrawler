@@ -2,6 +2,7 @@ package io.github.awidesky.liivQuizCrawler;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -81,7 +82,7 @@ public class Tstory {
 	}
 	private static String getQuizAnswer(String link) {
 		String[] html = HTML.getText(link);
-		Pattern titlePattern = Pattern.compile("^<blockquote(.*?)>((<b>(\\s*)퀴즈\\s*정답(\\s*)</b>)|(<span(.*?)>(\\s*)퀴즈\\s*정답(\\s*)</span>))(.*?)</blockquote>");
+		Pattern titlePattern = Pattern.compile("<blockquote(.*?)>((<b>(\\s*)퀴즈\\s*정답(\\s*)</b>)|(<span(.*?)>(\\s*)퀴즈\\s*정답(\\s*)</span>))(.*?)</blockquote>");
 		Pattern pattern = Pattern.compile("(<span(.*?)>(.+?)</span>)");
 		for(int i = 0; i < html.length; i++) {
 			Matcher tm = titlePattern.matcher(html[i]);
@@ -101,6 +102,15 @@ public class Tstory {
 			}
 		}
 		System.out.println("Cannot find title " + titlePattern);
+		if(Main.isDebug()) {
+			Main.debug("All blockquotes :");
+			Pattern blockquote = Pattern.compile("<blockquote(.*?)>(.*?)</blockquote>");
+			Arrays.stream(html)
+				.parallel()
+				.filter(s -> blockquote.matcher(s).find())
+				.forEach(Main::debug);
+			Main.debug("Blockquotes end\n");
+		}
 		String ret = null;
 		System.out.println("Possible answer :");
 		Pattern puntPattern = Pattern.compile("(.*)퀴즈\\s*정답(.{1,30})(.*)");

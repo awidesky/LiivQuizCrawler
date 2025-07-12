@@ -150,4 +150,8 @@ public class Main {
 	public static void debug(String str) {
 		if(debug) System.out.println(str);
 	}
+	
+	public static boolean isDebug() {
+		return debug;
+	}
 }
