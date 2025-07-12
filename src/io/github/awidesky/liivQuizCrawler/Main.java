@@ -1,5 +1,7 @@
 package io.github.awidesky.liivQuizCrawler;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -10,6 +12,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
@@ -48,9 +51,17 @@ public class Main {
 				JFrame f = new JFrame("LiivQuizCrawler");
 				f.setSize(120, 90);
 				JTextArea ja = new JTextArea();
-				//ja.getDocument()
-				//out = new PrintSt
-				
+				ja.setEditable(false);
+				out = new PrintStream(new OutputStream() {
+					@Override
+					public void write(int b) throws IOException {
+						ja.append(String.valueOf((char) b));
+					}
+				});
+				f.add(ja);
+				f.setVisible(true);
+				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				break;
 			}
 			
 		}
