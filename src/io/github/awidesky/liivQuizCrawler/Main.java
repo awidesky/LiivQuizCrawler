@@ -1,5 +1,6 @@
 package io.github.awidesky.liivQuizCrawler;
 
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -9,29 +10,49 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
 
 public class Main {
 
 	private static boolean debug = false;
 	private static Object[] oneLiner = new String[5];
+	private static PrintStream out = System.out;
 	
 	public static void main(String[] args) {
 
 		for(int i = 0; i < args.length; i++) {
-			if("--getText".equals(args[i])) {
+			switch (args[i]) {
+			case "--getText":
 				String link;
-				if(i < args.length) link = args[i + 1];
+				if (i < args.length)
+					link = args[i + 1];
 				else {
-					System.out.print("Enter link to print > ");
+					out.print("Enter link to print > ");
 					Scanner sc = new Scanner(System.in);
 					link = sc.nextLine();
 					sc.close();
 				}
-				for(String s : HTML.getText(link)) System.out.println(s);
+				for (String s : HTML.getText(link))
+					out.println(s);
 				return;
-			} else if ("--debug".equals(args[i])) {
+				
+			case "--debug":
 				debug = true;
+				break;
+				
+			case "--toFile":
+				break;
+				
+			case "--gui":
+				JFrame f = new JFrame("LiivQuizCrawler");
+				f.setSize(120, 90);
+				JTextArea ja = new JTextArea();
+				//ja.getDocument()
+				//out = new PrintSt
+				
 			}
+			
 		}
 		
 		
@@ -44,10 +65,10 @@ public class Main {
 					continue;
 				}
 				if (arr[i].contains("출석퀴즈")) {
-					System.out.printf("%s : %s\n", arr[i], arr[i + 1]);
+					out.printf("%s : %s\n", arr[i], arr[i + 1]);
 					oneLiner[0] = arr[i + 1];
 				} else if (arr[i].contains("쏠퀴즈")) {
-					System.out.printf("%s : %s\n", arr[i], arr[i + 1]);
+					out.printf("%s : %s\n", arr[i], arr[i + 1]);
 					oneLiner[1] = arr[i + 1];
 				}
 			}
@@ -59,25 +80,25 @@ public class Main {
 			oneLiner[1] = Tstory.getSOLBaseballQuizAnswer(today);
 		}
 		
-		System.out.println();
+		out.println();
 		oneLiner[2] = Tstory.getKBPayQuizAnswer(today);
 		if (oneLiner[2] == null) {
 			arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
 			if (arr != null) {
-				System.out.println(arr[0] + " : " + arr[1]);
+				out.println(arr[0] + " : " + arr[1]);
 				oneLiner[2] = arr[1];
 			}
 		}
 
-		System.out.println();
+		out.println();
 		oneLiner[3] = Tstory.getHanaQuizAnswer(today);
 		
-		System.out.println();
+		out.println();
 		oneLiner[4] = Tstory.getKBQuizAnswer(today);
 		
-		System.out.println("\n");
-		System.out.printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"", oneLiner);
-		System.out.println();
+		out.println("\n");
+		out.printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"", oneLiner);
+		out.println();
 	}
 	
 	private static final String newsList = "https://www.bntnews.co.kr/article/list/bnt005005000"; 
@@ -103,7 +124,7 @@ public class Main {
 			if(t == -1) throw new RuntimeException("Cannot find <title> from " + sol);
 			matcher = titlePattern.matcher(html[t]);
 			matcher.find();
-			System.out.println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
+			out.println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
 			
 			/* find quiz answer */
 			pattern = Pattern.compile("((<strong>(.+?)</strong>)|(<b>(.+?)</b>))");
@@ -113,7 +134,7 @@ public class Main {
 				try {
 					matcher = pattern.matcher(html[j++]);
 				} catch (ArrayIndexOutOfBoundsException e) {
-					System.out.println("Cannot find pattern more than " + i + "(" + n + "expected): \"" + pattern.pattern() + "\" from " + title);
+					out.println("Cannot find pattern more than " + i + "(" + n + "expected): \"" + pattern.pattern() + "\" from " + title);
 					//Arrays.stream(html).forEach(System.out::println);
 					break;
 				}
@@ -143,12 +164,15 @@ public class Main {
 		
 		int i = Math.max(idx - 5, 0);
 		int j = Math.min(idx + 5, arr.length);
-		System.out.println("Found \"" + arr[idx].strip() + "\" from line " + (idx + 1));
-		for(int n = i; n < j; n++) System.out.println(arr[n]);
+		out.println("Found \"" + arr[idx].strip() + "\" from line " + (idx + 1));
+		for(int n = i; n < j; n++) out.println(arr[n]);
 	}
 	
 	public static void debug(String str) {
-		if(debug) System.out.println(str);
+		if(debug) out.println(str);
+	}
+	public static void println(String str) {
+		out.println(str);
 	}
 	
 	public static boolean isDebug() {

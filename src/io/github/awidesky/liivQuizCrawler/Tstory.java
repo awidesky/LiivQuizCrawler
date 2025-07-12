@@ -34,7 +34,7 @@ public class Tstory {
 		String ret = null;
 		
 		if(link != null) {
-			System.out.println(HTML.getTextFilterFirst(link, s -> {
+			Main.println(HTML.getTextFilterFirst(link, s -> {
 				Pattern p = Pattern.compile("<title>(.*?)</title>");
 				Matcher m = p.matcher(s);
 				if(m.find()) return m.group(1);
@@ -43,7 +43,7 @@ public class Tstory {
 			Main.debug("Raw url : " + link);
 			ret = getQuizAnswer(link);
 		}
-		System.out.println(title + " : " + ret); //TODO : this might be null
+		Main.println(title + " : " + ret); //TODO : this might be null
 		return replaceChar(ret);
 		
 	}
@@ -65,7 +65,7 @@ public class Tstory {
 
 		return IntStream.range(1, 5).mapToObj(i -> findPatternFromList(listLink + "?page=" + i, linkPattern))
 				.filter(Optional::isPresent).map(Optional::get).findFirst().orElseGet(() -> {
-					System.out.println("Cannot find \"" + title + "\" from : " + listLink);
+					Main.println("Cannot find \"" + title + "\" from : " + listLink);
 					return null;
 				});
 	}
@@ -94,14 +94,14 @@ public class Tstory {
 					return Optional.ofNullable(matcher.group(3)).get()
 								.replaceAll("(<(.*?)>)", "").replaceAll("[\\[\\]]", "").strip();
 				} else {
-					System.out.println("Cannot find content " + pattern + " after finding " + titlePattern);
+					Main.println("Cannot find content " + pattern + " after finding " + titlePattern);
 					for(int j = i - 10; j < i + 10; j++)
 						if(0 <= j && j < html.length) Main.debug("[" + j + "] " + html[j]);
 					return tm.group(10).replaceAll("<(.*?)>", "").strip();
 				}
 			}
 		}
-		System.out.println("Cannot find title " + titlePattern);
+		Main.println("Cannot find title " + titlePattern);
 		if(Main.isDebug()) {
 			Main.debug("All blockquotes :");
 			Pattern blockquote = Pattern.compile("<blockquote(.*?)>(.*?)</blockquote>");
@@ -112,7 +112,7 @@ public class Tstory {
 			Main.debug("Blockquotes end\n");
 		}
 		String ret = null;
-		System.out.println("Possible answer :");
+		Main.println("Possible answer :");
 		Pattern puntPattern = Pattern.compile("(.*)퀴즈\\s*정답(.{1,30})(.*)");
 		for(int i = 0; i < html.length; i++) {
 			Matcher m = puntPattern.matcher(html[i]);
@@ -120,7 +120,7 @@ public class Tstory {
 				String str = m.group(2).strip();
 				if(ret == null && replace.keySet().stream().anyMatch(str::contains))
 					ret = str.replaceAll("\\s*앱테크 포인트 모으기.*", "");
-				System.out.println(str);
+				Main.println(str);
 			}
 		}
 		return ret;
