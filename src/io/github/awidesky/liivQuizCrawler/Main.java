@@ -1,26 +1,28 @@
 package io.github.awidesky.liivQuizCrawler;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class Main {
 
 	private static boolean debug = false;
 	private static Object[] oneLiner = new String[5];
-	private static PrintStream out = System.out;
+	private static Consumer<String> out = s -> System.out.print(s);
 	
 	public static void main(String[] args) {
 
@@ -31,34 +33,31 @@ public class Main {
 				if (i < args.length)
 					link = args[i + 1];
 				else {
-					out.print("Enter link to print > ");
+					print("Enter link to print > ");
 					Scanner sc = new Scanner(System.in);
 					link = sc.nextLine();
 					sc.close();
 				}
 				for (String s : HTML.getText(link))
-					out.println(s);
+					println(s);
 				return;
 				
 			case "--debug":
 				debug = true;
 				break;
 				
-			case "--toFile":
-				break;
-				
 			case "--gui":
+				Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 				JFrame f = new JFrame("LiivQuizCrawler");
-				f.setSize(120, 90);
+				f.setSize(1000, 600);
+				f.setLocation(dim.width/2-f.getSize().width/2, dim.height/2-f.getSize().height/2);
+				f.setLayout(new BorderLayout());
 				JTextArea ja = new JTextArea();
 				ja.setEditable(false);
-				out = new PrintStream(new OutputStream() {
-					@Override
-					public void write(int b) throws IOException {
-						ja.append(String.valueOf((char) b));
-					}
-				});
-				f.add(ja);
+				ja.setLineWrap(true);
+				out = s -> { ja.append(s); ja.setCaretPosition(ja.getText().length()); };
+				JScrollPane sp = new JScrollPane(ja, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				f.add(sp, BorderLayout.CENTER);
 				f.setVisible(true);
 				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				break;
@@ -76,10 +75,10 @@ public class Main {
 					continue;
 				}
 				if (arr[i].contains("출석퀴즈")) {
-					out.printf("%s : %s\n", arr[i], arr[i + 1]);
+					printf("%s : %s\n", arr[i], arr[i + 1]);
 					oneLiner[0] = arr[i + 1];
 				} else if (arr[i].contains("쏠퀴즈")) {
-					out.printf("%s : %s\n", arr[i], arr[i + 1]);
+					printf("%s : %s\n", arr[i], arr[i + 1]);
 					oneLiner[1] = arr[i + 1];
 				}
 			}
@@ -91,25 +90,25 @@ public class Main {
 			oneLiner[1] = Tstory.getSOLBaseballQuizAnswer(today);
 		}
 		
-		out.println();
+		println();
 		oneLiner[2] = Tstory.getKBPayQuizAnswer(today);
 		if (oneLiner[2] == null) {
 			arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
 			if (arr != null) {
-				out.println(arr[0] + " : " + arr[1]);
+				println(arr[0] + " : " + arr[1]);
 				oneLiner[2] = arr[1];
 			}
 		}
 
-		out.println();
+		println();
 		oneLiner[3] = Tstory.getHanaQuizAnswer(today);
 		
-		out.println();
+		println();
 		oneLiner[4] = Tstory.getKBQuizAnswer(today);
 		
-		out.println("\n");
-		out.printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"", oneLiner);
-		out.println();
+		println("\n");
+		printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"", oneLiner);
+		println();
 	}
 	
 	private static final String newsList = "https://www.bntnews.co.kr/article/list/bnt005005000"; 
@@ -135,7 +134,7 @@ public class Main {
 			if(t == -1) throw new RuntimeException("Cannot find <title> from " + sol);
 			matcher = titlePattern.matcher(html[t]);
 			matcher.find();
-			out.println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
+			println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
 			
 			/* find quiz answer */
 			pattern = Pattern.compile("((<strong>(.+?)</strong>)|(<b>(.+?)</b>))");
@@ -145,7 +144,7 @@ public class Main {
 				try {
 					matcher = pattern.matcher(html[j++]);
 				} catch (ArrayIndexOutOfBoundsException e) {
-					out.println("Cannot find pattern more than " + i + "(" + n + "expected): \"" + pattern.pattern() + "\" from " + title);
+					println("Cannot find pattern more than " + i + "(" + n + "expected): \"" + pattern.pattern() + "\" from " + title);
 					//Arrays.stream(html).forEach(System.out::println);
 					break;
 				}
@@ -175,15 +174,24 @@ public class Main {
 		
 		int i = Math.max(idx - 5, 0);
 		int j = Math.min(idx + 5, arr.length);
-		out.println("Found \"" + arr[idx].strip() + "\" from line " + (idx + 1));
-		for(int n = i; n < j; n++) out.println(arr[n]);
+		println("Found \"" + arr[idx].strip() + "\" from line " + (idx + 1));
+		for(int n = i; n < j; n++) println(arr[n]);
 	}
 	
 	public static void debug(String str) {
-		if(debug) out.println(str);
+		if(debug) println(str);
+	}
+	public static void println() {
+		print("\n");
 	}
 	public static void println(String str) {
-		out.println(str);
+		print(str + "\n");
+	}
+	public static void printf(String str, Object... args) {
+		print(str.formatted(args));
+	}
+	public static void print(String str) {
+		out.accept(str);
 	}
 	
 	public static boolean isDebug() {
