@@ -61,6 +61,10 @@ public class Main {
 				f.setVisible(true);
 				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				break;
+				
+			default:
+				System.err.println("Unknown option : " + args[i]);
+				break;
 			}
 			
 		}
