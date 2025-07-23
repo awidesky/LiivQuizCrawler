@@ -1,3 +1,6 @@
+build/
+jre/
+
 # Created by https://www.toptal.com/developers/gitignore/api/java,eclipse,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,eclipse,macos,windows
 
