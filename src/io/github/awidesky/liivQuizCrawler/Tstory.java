@@ -34,8 +34,8 @@ public class Tstory {
 		String ret = null;
 		
 		if(link != null) {
+			Pattern p = Pattern.compile("<title>(.*?)</title>");
 			Main.println(HTML.getTextFilterFirst(link, s -> {
-				Pattern p = Pattern.compile("<title>(.*?)</title>");
 				Matcher m = p.matcher(s);
 				if(m.find()) return m.group(1);
 				else return null;
@@ -82,6 +82,7 @@ public class Tstory {
 	}
 	private static String getQuizAnswer(String link) {
 		String[] html = HTML.getText(link);
+		Main.debug("HTML for quiz loaded, lines : " + html.length + ", approx bytes : " + Arrays.stream(html).parallel().mapToInt(s -> s.length() * 2).sum());
 		Pattern titlePattern = Pattern.compile("^\\s*<blockquote(.*?)>((<b>(\\s*)퀴즈\\s*정답(\\s*)</b>)|(<span(.*?)>(\\s*)퀴즈\\s*정답(\\s*)</span>))(.*?)</blockquote>");
 		Pattern pattern = Pattern.compile("(<span(.*?)>(.+?)</span>)");
 		for(int i = 0; i < html.length; i++) {

@@ -119,6 +119,7 @@ public class Main {
 	private static String[] find_quiz(String title, int n) {
 		try {
 			String[] html = HTML.getText(newsList);
+			debug("HTML for news list loaded, lines : " + html.length + ", approx bytes : " + Arrays.stream(html).parallel().mapToInt(s -> s.length() * 2).sum());
 			
 			int ii = search(html, s -> s.contains(title));
 			if(ii == -1) throw new RuntimeException("Cannot find \"" + title + "\"" + " from " + newsList);
@@ -132,6 +133,7 @@ public class Main {
 			debug("Found quiz link : " + sol);
 
 			html = HTML.getText(sol);
+			debug("HTML for quiz loaded, lines : " + html.length + ", approx bytes : " + Arrays.stream(html).parallel().mapToInt(s -> s.length() * 2).sum());
 			/* find title */
 			Pattern titlePattern = Pattern.compile("<title>(.*?)</title>");
 			int t = search(html, s -> titlePattern.matcher(s).find());
