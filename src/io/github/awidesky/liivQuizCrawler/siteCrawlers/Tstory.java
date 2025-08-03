@@ -1,36 +1,36 @@
-package io.github.awidesky.liivQuizCrawler;
+package io.github.awidesky.liivQuizCrawler.siteCrawlers;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
+
+import io.github.awidesky.liivQuizCrawler.HTML;
+import io.github.awidesky.liivQuizCrawler.Main;
 
 public class Tstory {
 
-	private static final String listLink = "https://bookshelf-journey.tistory.com/category";
-	
-	public static String getHanaQuizAnswer(String today) {
-		return getQuiz("하나원큐 축구Play 퀴즈HANA", today);
+	private static final String listLink = "https://bookshelf-journey.tistory.com/category?page=" ;
+
+	public static String getHanaQuizAnswer() {
+		return getQuiz("하나원큐 축구Play 퀴즈HANA");
 	}
-	public static String getKBQuizAnswer(String today) {
-		return getQuiz("KB 스타뱅킹 스타퀴즈", today);
+	public static String getKBQuizAnswer() {
+		return getQuiz("KB 스타뱅킹 스타퀴즈");
 	}
-	public static String getKBPayQuizAnswer(String today) {
-		return getQuiz("KB Pay 오늘의 퀴즈", today);
+	public static String getKBPayQuizAnswer() {
+		return getQuiz("KB Pay 오늘의 퀴즈");
 	}
-	public static String getSOLQuizAnswer(String today) {
-		return getQuiz("신한 슈퍼 SOL 출석 퀴즈", today);
+	public static String getSOLQuizAnswer() {
+		return getQuiz("신한 슈퍼 SOL 출석 퀴즈");
 	}
-	public static String getSOLBaseballQuizAnswer(String today) {
-		return getQuiz("신한 슈퍼 SOL 야구/상식 쏠퀴즈", today);
+	public static String getSOLBaseballQuizAnswer() {
+		return getQuiz("신한 슈퍼 SOL 야구/상식 쏠퀴즈");
 	}
 
-	private static String getQuiz(String title, String today) {
-		String link = getQuizlink("\\[" + title + "\\] " + today);
+	private static String getQuiz(String title) {
+		String link = HTML.getQuizlink(listLink, Pattern.compile(".*\"item\":\\{\"@id\":\"(.*?)\",\"name\":\"" + title), 1);
 		String ret = null;
 		
 		if(link != null) {
@@ -39,7 +39,7 @@ public class Tstory {
 				Matcher m = p.matcher(s);
 				if(m.find()) return m.group(1);
 				else return null;
-			}) + " : " + encodeURL(link));
+			}) + " : " + HTML.encodeURL(link));
 			Main.debug("Raw url : " + link);
 			ret = getQuizAnswer(link);
 		}
@@ -58,30 +58,6 @@ public class Tstory {
 		return str;
 	}
 	
-	private static String encodeURL(String link) {
-		return URLDecoder.decode(link, StandardCharsets.UTF_8);
-	}
-	
-	private static String getQuizlink(String title) {
-		Pattern linkPattern  = Pattern.compile(".*\"item\":\\{\"@id\":\"(.*?)\",\"name\":\"" + title);
-
-		return IntStream.range(1, 5).mapToObj(i -> findPatternFromList(listLink + "?page=" + i, linkPattern))
-				.filter(Optional::isPresent).map(Optional::get).findFirst().orElseGet(() -> {
-					Main.println("Cannot find article \"" + title + "\" from : " + listLink);
-					return null;
-				});
-	}
-	
-	private static Optional<String> findPatternFromList(String link, Pattern linkPattern) {
-		return HTML.getTextFilterFirstOptional(link, s -> {
-			Matcher m = linkPattern.matcher(s);
-			if(m.find()) {
-				return m.group(1);
-			} else {
-				return null;
-			}
-		});
-	}
 	private static String getQuizAnswer(String link) {
 		String[] html = HTML.getText(link);
 		Main.debug("HTML for quiz loaded, lines : " + html.length + ", approx bytes : " + Arrays.stream(html).parallel().mapToInt(s -> s.length() * 2).sum());

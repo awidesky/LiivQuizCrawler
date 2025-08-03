@@ -8,10 +8,13 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -19,6 +22,9 @@ import java.util.stream.IntStream;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import io.github.awidesky.liivQuizCrawler.siteCrawlers.Tipistip;
+import io.github.awidesky.liivQuizCrawler.siteCrawlers.Tstory;
 
 public class Main {
 
@@ -98,14 +104,15 @@ public class Main {
 			}
 		}
 		if(oneLiner[0] == null) {
-			oneLiner[0] = Tstory.getSOLQuizAnswer(today);
+			oneLiner[0] = Tstory.getSOLQuizAnswer();
 		}
 		if(oneLiner[1] == null) {
-			oneLiner[1] = Tstory.getSOLBaseballQuizAnswer(today);
+			oneLiner[1] = Tstory.getSOLBaseballQuizAnswer();
 		}
 		
 		println();
-		oneLiner[2] = Tstory.getKBPayQuizAnswer(today);
+		List<Supplier<String>> l = List.of(Tstory::getKBPayQuizAnswer, Tipistip::getKBPayQuizAnswer);
+		oneLiner[2] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
 		if (oneLiner[2] == null) {
 			arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
 			if (arr != null) {
@@ -115,10 +122,12 @@ public class Main {
 		}
 
 		println();
-		oneLiner[3] = Tstory.getHanaQuizAnswer(today);
+		l = List.of(Tstory::getHanaQuizAnswer, Tipistip::getHanaQuizAnswer);
+		oneLiner[3] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
 		
 		println();
-		oneLiner[4] = Tstory.getKBQuizAnswer(today);
+		l = List.of(Tstory::getKBQuizAnswer, Tipistip::getKBQuizAnswer);
+		oneLiner[4] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
 		
 		println("\n");
 		printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"", oneLiner);
