@@ -43,13 +43,15 @@ public class Tstory {
 			Main.debug("Raw url : " + link);
 			ret = getQuizAnswer(link);
 		}
-		Main.println(title + " : " + ret); //TODO : this might be null
+		Main.println(title + " : " + ret);
 		return replaceChar(ret);
 		
 	}
 	
 	private static Map<String, String> replace = Map.of("①", "1.", "②", "2.", "③", "3.", "④", "4.", "⑤", "5.");
 	private static String replaceChar(String str) {
+		if(str == null) return null;
+		
 		for(Map.Entry<String, String> e : replace.entrySet()) {
 			str = str.replace(e.getKey(), e.getValue());
 		}
@@ -65,7 +67,7 @@ public class Tstory {
 
 		return IntStream.range(1, 5).mapToObj(i -> findPatternFromList(listLink + "?page=" + i, linkPattern))
 				.filter(Optional::isPresent).map(Optional::get).findFirst().orElseGet(() -> {
-					Main.println("Cannot find \"" + title + "\" from : " + listLink);
+					Main.println("Cannot find article \"" + title + "\" from : " + listLink);
 					return null;
 				});
 	}

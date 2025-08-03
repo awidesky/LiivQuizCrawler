@@ -3,6 +3,8 @@ package io.github.awidesky.liivQuizCrawler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +38,9 @@ public class HTML {
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new URL(url).openConnection().getInputStream(), htmlCharset))) {
 			return f.apply(br.lines());
 		} catch (IOException e) {
-			e.printStackTrace();
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			Main.println(sw.toString());
 			return null;
 		}
 	}

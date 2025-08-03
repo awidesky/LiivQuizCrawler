@@ -3,6 +3,8 @@ package io.github.awidesky.liivQuizCrawler;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -25,6 +27,14 @@ public class Main {
 	private static Consumer<String> out = s -> System.out.print(s);
 	
 	public static void main(String[] args) {
+		
+		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+			println();
+			println("Uncaught Exception thrown!!");
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			println(sw.toString());
+		});
 
 		for(int i = 0; i < args.length; i++) {
 			switch (args[i]) {
@@ -122,7 +132,10 @@ public class Main {
 			debug("HTML for news list loaded, lines : " + html.length + ", approx bytes : " + Arrays.stream(html).parallel().mapToInt(s -> s.length() * 2).sum());
 			
 			int ii = search(html, s -> s.contains(title));
-			if(ii == -1) throw new RuntimeException("Cannot find \"" + title + "\"" + " from " + newsList);
+			if(ii == -1) {
+				println("Cannot find \"" + title + "\"" + " from " + newsList);
+				return null;
+			}
 			printSurroundings(html, ii);
 			Pattern pattern = Pattern.compile("(/article/view/bnt\\d+)");
 			Matcher matcher = pattern.matcher(html[ii - 1]);
@@ -137,7 +150,10 @@ public class Main {
 			/* find title */
 			Pattern titlePattern = Pattern.compile("<title>(.*?)</title>");
 			int t = search(html, s -> titlePattern.matcher(s).find());
-			if(t == -1) throw new RuntimeException("Cannot find <title> from " + sol);
+			if(t == -1) {
+				println("Cannot find <title> from " + sol);
+				return null;
+			}
 			matcher = titlePattern.matcher(html[t]);
 			matcher.find();
 			println(matcher.group(1).replace("| bnt뉴스", "").strip() + " : " + sol);
@@ -164,7 +180,9 @@ public class Main {
 			}
 			return ret;
 		} catch (Exception e) {
-			e.printStackTrace();
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			println(sw.toString());
 			return null;
 		}
 	}
