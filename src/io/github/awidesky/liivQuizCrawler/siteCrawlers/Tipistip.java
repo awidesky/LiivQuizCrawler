@@ -62,6 +62,7 @@ public class Tipistip {
 			if(!t.strip().startsWith(title + today)) {
 				Main.println("!!!Wrong Title!!! : " + t);
 				Main.println("!!!Should be      : " + title + today);
+				return "!!!Not Found!!!";
 			}
 			ret = getQuizAnswer(link);
 		}
