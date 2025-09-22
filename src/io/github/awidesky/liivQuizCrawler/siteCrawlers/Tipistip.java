@@ -28,8 +28,9 @@ public class Tipistip {
 
 	private static String getQuiz(String title) {
 		Pattern linkPattern = Pattern.compile(".*<a href=\\\"(.*?)\\\">.*");
-		String link = IntStream.range(1, 5).mapToObj(i -> listLink + i).map(HTML::getText)
-				.map(arr -> {
+		String link = IntStream.range(1, 5).mapToObj(i -> listLink + i)
+				.map(li -> {
+					String arr[] = HTML.getText(li);
 					for(int i = 0; i < arr.length; i++) {
 						if(arr[i].contains(title)) {
 							String s = arr[i-1].replace("&amp;", "&");
@@ -43,7 +44,7 @@ public class Tipistip {
 							}
 						}
 					}
-					Main.println("Cannot find title \"" + title + "\" from : " + listLink);
+					Main.println("Cannot find title \"" + title + "\" from : " + li);
 					return null;
 				})
 				.filter(Objects::nonNull).findFirst().orElse(null); 
