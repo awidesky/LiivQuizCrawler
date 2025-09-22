@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class HTML {
@@ -41,25 +38,7 @@ public class HTML {
 	public static String encodeURL(String link) {
 		return URLDecoder.decode(link, StandardCharsets.UTF_8);
 	}
-	
-	public static String getQuizlink(String listLink, Pattern linkPattern, int group) {
-		return IntStream.range(1, 5).mapToObj(i -> findPatternFromList(listLink + i, linkPattern, group))
-				.filter(Optional::isPresent).map(Optional::get).findFirst().orElseGet(() -> {
-					Main.println("Cannot find article \"" + linkPattern + "\" from : " + listLink);
-					return null;
-				});
-	}
-	
-	private static Optional<String> findPatternFromList(String link, Pattern linkPattern, int group) {
-		return HTML.getTextFilterFirstOptional(link, s -> {
-			Matcher m = linkPattern.matcher(s);
-			if(m.find()) {
-				return m.group(group);
-			} else {
-				return null;
-			}
-		});
-	}
+
 	
 	private static <T> T openURLconnection(String url, Function<Stream<String>, T> f) {
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new URL(url).openConnection().getInputStream(), htmlCharset))) {

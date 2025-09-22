@@ -1,10 +1,17 @@
 package io.github.awidesky.liivQuizCrawler.siteCrawlers;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import io.github.awidesky.liivQuizCrawler.HTML;
 import io.github.awidesky.liivQuizCrawler.Main;
@@ -20,7 +27,9 @@ public class Tstory {
 		return getQuiz("KB 스타뱅킹 스타퀴즈");
 	}
 	public static String getKBPayQuizAnswer() {
-		return getQuiz("KB Pay 오늘의 퀴즈");
+		String ret = getQuiz("KB Pay 오늘의 퀴즈");
+		if(ret == null && Main.isDebug()) printAllItems();
+		return ret;
 	}
 	public static String getSOLQuizAnswer() {
 		return getQuiz("신한 슈퍼 SOL 출석 퀴즈");
@@ -28,9 +37,33 @@ public class Tstory {
 	public static String getSOLBaseballQuizAnswer() {
 		return getQuiz("신한 슈퍼 SOL 야구/상식 쏠퀴즈");
 	}
+	
+	public static void printAllItems() {
+		System.out.println("All items found in " + listLink);
+		getQuizTitleMatchers(m -> true, m -> m.group() + "\n" + HTML.encodeURL(m.group(1)) + " : " + m.group(2))
+				.forEach(System.out::println);
+		System.out.println("List end");
+	}
 
+	private static Pattern linkPatten = Pattern.compile("\"item\":\\{\"@id\":\"(.*?)\",\"name\":\"(.*?)\\}");
+	private static Stream<String> getQuizTitleMatchers(Predicate<Matcher> p, Function<Matcher, String> mapper) {
+		return IntStream.range(1, 5).mapToObj(i -> HTML.getText(listLink + 1)).flatMap(Arrays::stream).map(linkPatten::matcher)
+				.map(m -> {
+					List<String> l = new LinkedList<>();
+					while(m.find()) {
+						if(p.test(m)) {
+							l.add(mapper.apply(m));
+						}
+					}
+					return l;
+				}).flatMap(List::stream);
+	}
 	private static String getQuiz(String title) {
-		String link = HTML.getQuizlink(listLink, Pattern.compile(".*\"item\":\\{\"@id\":\"(.*?)\",\"name\":\"" + title), 1);
+		String link = getQuizTitleMatchers(m -> m.group(2).contains(title), m -> m.group(1))
+				.filter(Objects::nonNull).findFirst().orElseGet(() -> {
+					Main.println("Cannot find article \"" + linkPatten.pattern() + "\" from : " + listLink);
+					return null;
+				});
 		String ret = null;
 		
 		if(link != null) {
