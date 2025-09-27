@@ -61,9 +61,9 @@ public class Tipistip {
 			Main.println(t + " : " + HTML.encodeURL(link));
 			Main.debug("Raw url : " + link);
 			if(!t.strip().startsWith(title + today)) {
-				Main.println("!!!Wrong Title!!! : " + t);
-				Main.println("!!!Should be      : " + title + today);
-				return "!!!Not Found!!!";
+				Main.println("!!!Wrong Title!!!    : " + t);
+				Main.println("!!!Should start with : " + title + today);
+				return null;
 			}
 			ret = getQuizAnswer(link);
 		}

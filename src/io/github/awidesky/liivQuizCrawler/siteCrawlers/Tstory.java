@@ -1,6 +1,8 @@
 package io.github.awidesky.liivQuizCrawler.siteCrawlers;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,8 @@ import io.github.awidesky.liivQuizCrawler.Main;
 
 public class Tstory {
 
-	private static final String listLink = "https://bookshelf-journey.tistory.com/category?page=" ;
+	private static final String listLink = "https://bookshelf-journey.tistory.com/category?page=";
+	private static final String today = new SimpleDateFormat("M월 d일").format(new Date());
 
 	public static String getHanaQuizAnswer() {
 		return getQuiz("하나원큐 축구Play 퀴즈HANA");
@@ -68,12 +71,19 @@ public class Tstory {
 		
 		if(link != null) {
 			Pattern p = Pattern.compile("<title>(.*?)</title>");
-			Main.println(HTML.getTextFilterFirst(link, s -> {
+			String t = HTML.getTextFilterFirst(link, s -> {
 				Matcher m = p.matcher(s);
 				if(m.find()) return m.group(1);
 				else return null;
-			}) + " : " + HTML.encodeURL(link));
+			});
+			Main.println(t + " : " + HTML.encodeURL(link));
 			Main.debug("Raw url : " + link);
+			t = t.replaceAll("\\[.*?\\]\\S*", "");
+			if(!t.startsWith(today)) {
+				Main.println("!!!Wrong Title!!!    : " + t);
+				Main.println("!!!Should start with : " + today);
+				return null;
+			}
 			ret = getQuizAnswer(link);
 		}
 		Main.println(title + " : " + ret);
