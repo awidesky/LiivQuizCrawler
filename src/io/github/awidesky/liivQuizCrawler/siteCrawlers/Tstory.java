@@ -78,10 +78,9 @@ public class Tstory {
 			});
 			Main.println(t + " : " + HTML.encodeURL(link));
 			Main.debug("Raw url : " + link);
-			t = t.replaceAll("\\[.*?\\]\\s*", "");
-			if(!t.startsWith(today)) {
+			if(!t.contains(today)) {
 				Main.println("!!!Wrong Title!!!    : " + t);
-				Main.println("!!!Should start with : " + today);
+				Main.println("!!!Should contain : " + today);
 				return null;
 			}
 			ret = getQuizAnswer(link);
