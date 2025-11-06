@@ -32,6 +32,10 @@ public class Tstory {
 	public static String getKBPayQuizAnswer() {
 		String ret = getQuiz("KB Pay 오늘의 퀴즈");
 		if(ret == null && Main.isDebug()) printAllItems();
+		if(("정답은 " + today + " 10:00시에 오픈합니다.").equals(ret)) {
+			Main.println("Quiz answer not open yet!");
+			ret = null;
+		}
 		return ret;
 	}
 	public static String getSOLQuizAnswer() {
