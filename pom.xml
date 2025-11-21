@@ -114,7 +114,7 @@
 							<dontWrapJar>true</dontWrapJar>
 							<headerType>gui</headerType>
 							<errTitle></errTitle>
-							<cmdLine></cmdLine>
+							<cmdLine>--debug --gui</cmdLine>
 							<chdir></chdir>
 							<priority>normal</priority>
 							<downloadUrl>https://adoptium.net/</downloadUrl>
