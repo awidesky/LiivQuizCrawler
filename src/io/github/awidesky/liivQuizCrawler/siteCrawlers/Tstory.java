@@ -24,7 +24,7 @@ public class Tstory {
 	private static final String today = new SimpleDateFormat("M월 d일").format(new Date());
 
 	public static String getHanaQuizAnswer() {
-		return getQuiz("하나원큐 축구Play 퀴즈HANA");
+		return getQuiz("하나원큐 축구Play 퀴즈HANA", Tstory::quiz_answer_text);
 	}
 	public static String getKBQuizAnswer() {
 		return getQuiz("KB 스타뱅킹 스타퀴즈");
@@ -66,6 +66,9 @@ public class Tstory {
 				}).flatMap(List::stream);
 	}
 	private static String getQuiz(String title) {
+		return getQuiz(title, Tstory::blockquote);
+	}
+	private static String getQuiz(String title, Function<String[], String> finder) {
 		String link = getQuizTitleMatchers(m -> m.group(2).contains(title), m -> m.group(1))
 				.filter(Objects::nonNull).findFirst().orElseGet(() -> {
 					Main.println("Cannot find article \"" + linkPatten.pattern() + "\" from : " + listLink);
@@ -87,7 +90,7 @@ public class Tstory {
 				Main.println("!!!Should contain : " + today);
 				return null;
 			}
-			ret = getQuizAnswer(link);
+			ret = getQuizAnswer(link, finder);
 		}
 		Main.println(title + " : " + ret);
 		return replaceChar(ret);
@@ -104,12 +107,32 @@ public class Tstory {
 		return str;
 	}
 	
-	private static String getQuizAnswer(String link) {
+	private static String getQuizAnswer(String link, Function<String[], String> finder) {
 		String[] html = HTML.getText(link);
 		Main.debug("HTML for quiz loaded, lines : " + html.length + ", approx bytes : " + Arrays.stream(html).parallel().mapToInt(s -> s.length() * 2).sum());
+		
+		String ret = finder.apply(html).strip();
+		if(ret != null) return ret;
+		
+		Main.println("Possible answer :");
+		Pattern puntPattern = Pattern.compile("(.*)퀴즈\\s*정답(.{1,30})(.*)");
+		for(int i = 0; i < html.length; i++) {
+			Matcher m = puntPattern.matcher(html[i]);
+			if(m.find()) {
+				String str = m.group(2).strip();
+				if(ret == null && replace.keySet().stream().anyMatch(str::contains))
+					ret = str.replaceAll("\\s*앱테크 포인트 모으기.*", "");
+				Main.println(str);
+			}
+		}
+		return ret;
+	}
+
+	
+	private static String blockquote(String[] html) {
 		Pattern titlePattern = Pattern.compile("^\\s*<blockquote(.*?)>((<b>(\\s*)퀴즈\\s*정답(\\s*)</b>)|(<span(.*?)>(\\s*)퀴즈\\s*정답(\\s*)</span>))(.*?)</blockquote>");
 		Pattern pattern = Pattern.compile("(<span(.*?)>(.+?)</span>)");
-		for(int i = 0; i < html.length; i++) {
+		for(int i = 0; i < html.length; i++) { // finderlist.get(0).find(html)v
 			Matcher tm = titlePattern.matcher(html[i]);
 			if(tm.find()) {
 				Matcher matcher = pattern.matcher(html[i]);
@@ -117,7 +140,7 @@ public class Tstory {
 				if(matcher.find() && matcher.find()) {
 					Main.debug("Found tag : " + matcher.group(0));
 					return Optional.ofNullable(matcher.group(3)).get()
-								.replaceAll("(<(.*?)>)", "").replaceAll("[\\[\\]]", "").strip();
+								.replaceAll("(<(.*?)>)", "").replaceAll("[\\[\\]]", "");
 				} else {
 					Main.println("Cannot find content " + pattern + " after finding " + titlePattern);
 					for(int j = i - 10; j < i + 10; j++)
@@ -136,19 +159,29 @@ public class Tstory {
 				.forEach(Main::debug);
 			Main.debug("Blockquotes end\n");
 		}
-		String ret = null;
-		Main.println("Possible answer :");
-		Pattern puntPattern = Pattern.compile("(.*)퀴즈\\s*정답(.{1,30})(.*)");
+		return null;
+	}
+	
+	private static String quiz_answer_text(String[] html) {
+		Pattern pattern = Pattern.compile("<div\\s+class=\"quiz-answer-text-area\"\\s*>\\s*"
+				+ "<span\\s+class=\"quiz-answer-text\"\\s*>(.*?)</span>\\s*</div>", Pattern.DOTALL);
 		for(int i = 0; i < html.length; i++) {
-			Matcher m = puntPattern.matcher(html[i]);
-			if(m.find()) {
-				String str = m.group(2).strip();
-				if(ret == null && replace.keySet().stream().anyMatch(str::contains))
-					ret = str.replaceAll("\\s*앱테크 포인트 모으기.*", "");
-				Main.println(str);
+			Matcher matcher = pattern.matcher(html[i]);
+			if(matcher.find()) {
+				Main.debug("Found line : " + matcher.group(0));
+				return matcher.group(1);
 			}
 		}
-		return ret;
+		Main.println("Cannot find <div class=\"quiz-answer-text-area\"><span class=\"quiz-answer-text\">(.*?)</span></div>");
+	
+		Pattern narrowPattern = Pattern.compile("\"quiz-answer-text\">(.*?)<");
+		Main.debug("Check narrow pattern : " + narrowPattern.pattern());
+		return Arrays.stream(html)
+				.parallel()
+				.map(narrowPattern::matcher)
+				.filter(Matcher::find)
+				.map(m -> m.group(0))
+				.peek(Main::debug)
+				.findAny().orElse(null);
 	}
-
 }
