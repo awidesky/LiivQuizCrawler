@@ -1,8 +1,6 @@
 package io.github.awidesky.liivQuizCrawler.siteCrawlers;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +19,7 @@ import io.github.awidesky.liivQuizCrawler.Main;
 public class Tstory {
 
 	private static final String listLink = "https://bookshelf-journey.tistory.com/category?page=";
-	private static final String today = new SimpleDateFormat("M월 d일").format(new Date());
+	private static final String today = Main.getDate("M월 d일");
 
 	public static String getHanaQuizAnswer() {
 		return getQuiz("하나원큐 축구Play 퀴즈HANA", Tstory::quiz_answer_text);

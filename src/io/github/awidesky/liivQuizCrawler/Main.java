@@ -5,10 +5,12 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
@@ -86,7 +88,7 @@ public class Main {
 		}
 		
 		
-		final String today = new SimpleDateFormat("M월 d일").format(new Date());
+		final String today = getDate("M월 d일");
 		debug("Today : " + today);
 		String[] arr = find_quiz("쏠퀴즈", 7);
 		if(arr != null) {
@@ -229,5 +231,10 @@ public class Main {
 	
 	public static boolean isDebug() {
 		return debug;
+	}
+	
+	public static String getDate(String format) {
+		return DateTimeFormatter.ofPattern(format, Locale.ENGLISH)
+					.format(LocalDate.now(ZoneId.of("Asia/Seoul")));
 	}
 }
