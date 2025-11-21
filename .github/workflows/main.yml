@@ -1,0 +1,43 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build
+        run: mvn -B package
+
+      - name: Prepare Windows artifacts
+        shell: pwsh
+        run: |
+          cd target
+          Compress-Archive -Path "LiivQuizCrawler/*" -DestinationPath "LiivQuizCrawler.zip" -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: |
+            target/LiivQuizCrawler.zip
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/LiivQuizCrawler.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
