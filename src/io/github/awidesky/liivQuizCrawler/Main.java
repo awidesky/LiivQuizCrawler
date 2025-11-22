@@ -34,6 +34,8 @@ public class Main {
 	private static Object[] oneLiner = new String[5];
 	private static Consumer<String> out = s -> System.out.print(s);
 	
+	public static final String VERSION = "v2.4";
+	
 	public static void main(String[] args) {
 		
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -66,7 +68,7 @@ public class Main {
 				
 			case "--gui":
 				Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-				JFrame f = new JFrame("LiivQuizCrawler");
+				JFrame f = new JFrame("LiivQuizCrawler " + VERSION);
 				f.setSize(1000, 600);
 				f.setLocation(dim.width/2-f.getSize().width/2, dim.height/2-f.getSize().height/2);
 				f.setLayout(new BorderLayout());
@@ -89,6 +91,7 @@ public class Main {
 		
 		
 		final String today = getDate("M월 d일");
+		debug("LiivQuizCrawler " + VERSION); debug("");
 		debug("Today : " + today);
 		String[] arr = find_quiz("쏠퀴즈", 7);
 		if(arr != null) {
