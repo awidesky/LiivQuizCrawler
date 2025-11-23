@@ -91,7 +91,7 @@ public class Main {
 		
 		
 		final String today = getDate("M월 d일");
-		debug("LiivQuizCrawler " + VERSION); debug("");
+		println("LiivQuizCrawler " + VERSION);
 		debug("Today : " + today);
 		String[] arr = find_quiz("쏠퀴즈", 7);
 		if(arr != null) {
