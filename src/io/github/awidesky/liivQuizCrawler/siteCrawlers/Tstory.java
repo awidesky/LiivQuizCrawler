@@ -44,10 +44,10 @@ public class Tstory {
 	}
 	
 	public static void printAllItems() {
-		System.out.println("All items found in " + listLink);
+		Main.println("All items found in " + listLink);
 		getQuizTitleMatchers(m -> true, m -> m.group() + "\n" + HTML.encodeURL(m.group(1)) + " : " + m.group(2))
 				.forEach(System.out::println);
-		System.out.println("List end");
+		Main.println("List end");
 	}
 
 	private static Pattern linkPatten = Pattern.compile("\"item\":\\{\"@id\":\"(.*?)\",\"name\":\"(.*?)\\}");
