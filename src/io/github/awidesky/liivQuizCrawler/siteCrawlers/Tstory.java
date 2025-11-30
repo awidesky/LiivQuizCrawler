@@ -84,7 +84,7 @@ public class Tstory {
 			Main.println(t + " : " + HTML.encodeURL(link));
 			Main.debug("Raw url : " + link);
 			if(!t.contains(today)) {
-				Main.println("!!!Wrong Title!!!    : " + t);
+				Main.println("!!!Wrong Title!!! : " + t);
 				Main.println("!!!Should contain : " + today);
 				return null;
 			}
