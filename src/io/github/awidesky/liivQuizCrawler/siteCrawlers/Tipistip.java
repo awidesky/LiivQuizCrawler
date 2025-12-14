@@ -66,7 +66,7 @@ public class Tipistip {
 			ret = getQuizAnswer(link);
 		}
 		Main.println(title + " : " + ret);
-		return ret;
+		return Main.fixString(ret);
 		
 	}
 	

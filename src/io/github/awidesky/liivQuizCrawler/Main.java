@@ -11,6 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
@@ -214,6 +216,19 @@ public class Main {
 		int j = Math.min(idx + 5, arr.length);
 		println("Found \"" + arr[idx].strip() + "\" from line " + (idx + 1));
 		for(int n = i; n < j; n++) println(arr[n]);
+	}
+	
+	private static final Map<String, String> escapes = Map.of("&nbsp;", " ", "&quot;", "\"", "&amp;", "&", "&lt;", "<", "&gt;", ">");
+	public static final Map<String, String>  numbers = Map.of("①", "1.", "②", "2.", "③", "3.", "④", "4.", "⑤", "5.");
+	public static String fixString(String str) {
+		String ret = str.strip();
+		for(Entry<String, String> e : escapes.entrySet()) {
+			ret = ret.replace(e.getKey(), e.getValue());
+		}
+		for(Entry<String, String> e : numbers.entrySet()) {
+			ret = ret.replace(e.getKey(), e.getValue());
+		}
+		return ret;
 	}
 	
 	public static void debug(String str) {

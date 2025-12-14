@@ -3,7 +3,6 @@ package io.github.awidesky.liivQuizCrawler.siteCrawlers;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -91,18 +90,8 @@ public class Tstory {
 			ret = getQuizAnswer(link, finder);
 		}
 		Main.println(title + " : " + ret);
-		return replaceChar(ret);
+		return Main.fixString(ret);
 		
-	}
-	
-	private static Map<String, String> replace = Map.of("①", "1.", "②", "2.", "③", "3.", "④", "4.", "⑤", "5.");
-	private static String replaceChar(String str) {
-		if(str == null) return null;
-		
-		for(Map.Entry<String, String> e : replace.entrySet()) {
-			str = str.replace(e.getKey(), e.getValue());
-		}
-		return str;
 	}
 	
 	private static String getQuizAnswer(String link, Function<String[], String> finder) {
@@ -118,7 +107,7 @@ public class Tstory {
 			Matcher m = puntPattern.matcher(html[i]);
 			if(m.find()) {
 				String str = m.group(2).strip();
-				if(ret == null && replace.keySet().stream().anyMatch(str::contains))
+				if(Main.numbers.keySet().stream().anyMatch(str::contains))
 					ret = str.replaceAll("\\s*앱테크 포인트 모으기.*", "");
 				Main.println(str);
 			}
