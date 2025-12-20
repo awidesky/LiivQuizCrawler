@@ -21,7 +21,7 @@ public class Tstory {
 	private static final String today = Main.getDate("M월 d일");
 
 	public static String getHanaQuizAnswer() {
-		return getQuiz("하나원큐 축구Play 퀴즈HANA", Tstory::quiz_answer_text);
+		return getQuiz("하나원큐 축구Play 퀴즈HANA", Tstory::QUIZ_DATA);
 	}
 	public static String getKBQuizAnswer() {
 		return getQuiz("KB 스타뱅킹 스타퀴즈");
@@ -88,6 +88,7 @@ public class Tstory {
 				return null;
 			}
 			ret = getQuizAnswer(link, finder);
+			if(ret != null) ret = ret.strip();
 		}
 		Main.println(title + " : " + ret);
 		return Main.fixString(ret);
@@ -98,7 +99,7 @@ public class Tstory {
 		String[] html = HTML.getText(link);
 		Main.debug("HTML for quiz loaded, lines : " + html.length + ", approx bytes : " + Arrays.stream(html).parallel().mapToInt(s -> s.length() * 2).sum());
 		
-		String ret = finder.apply(html).strip();
+		String ret = finder.apply(html);
 		if(ret != null) return ret;
 		
 		Main.println("Possible answer :");
@@ -149,6 +150,26 @@ public class Tstory {
 		return null;
 	}
 	
+	private static String QUIZ_DATA(String[] html) {
+		Pattern quizdataPattern = Pattern.compile("^\\s*const QUIZ_DATA = \\{");
+		Pattern pattern = Pattern.compile("answer: \\\"(.*?)\\\",");
+		for(int i = 0; i < html.length; i++) {
+			Matcher tm = quizdataPattern.matcher(html[i]);
+			if(tm.find()) {
+				for(int j = i; j < html.length; j++) {
+					Matcher matcher = pattern.matcher(html[j]);
+					if(matcher.find()) {
+						Main.debug("Found line : " + tm.group(0));
+						return matcher.group(1);
+					}
+				}
+			}
+		}
+		Main.println("Cannot find " + quizdataPattern);
+		return null;
+	}
+	
+	@SuppressWarnings("unused")
 	private static String quiz_answer_text(String[] html) {
 		Pattern pattern = Pattern.compile("<div\\s+class=\"quiz-answer-text-area\"\\s*>\\s*"
 				+ "<span\\s+class=\"quiz-answer-text\"\\s*>(.*?)</span>\\s*</div>", Pattern.DOTALL);
