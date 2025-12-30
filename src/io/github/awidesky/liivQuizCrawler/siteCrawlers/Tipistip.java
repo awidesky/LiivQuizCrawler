@@ -12,7 +12,7 @@ import io.github.awidesky.liivQuizCrawler.Main;
 public class Tipistip {
 
 	private static final String listLink = "https://www.tipistip.com/bbs/board.php?bo_table=quiz&page=" ;
-	private static final String today = Main.getDate("[YYYY년 MM월 dd일]");
+	private static final String today = Main.getDate("[yyyy년 MM월 dd일]");
 	
 	public static String getHanaQuizAnswer() {
 		return getQuiz("기타퀴즈] 하나원큐 (오른쪽 하단 메뉴 &gt; 이벤트/스포츠 &gt; 하나원큐 축구Play &gt; 퀴즈HANA)");
