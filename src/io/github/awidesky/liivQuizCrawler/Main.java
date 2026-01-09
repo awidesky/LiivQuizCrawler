@@ -221,6 +221,8 @@ public class Main {
 	private static final Map<String, String> escapes = Map.of("&nbsp;", " ", "&quot;", "\"", "&amp;", "&", "&lt;", "<", "&gt;", ">");
 	public static final Map<String, String>  numbers = Map.of("①", "1.", "②", "2.", "③", "3.", "④", "4.", "⑤", "5.");
 	public static String fixString(String str) {
+		if(str == null) return null;
+		
 		String ret = str.strip();
 		for(Entry<String, String> e : escapes.entrySet()) {
 			ret = ret.replace(e.getKey(), e.getValue());
