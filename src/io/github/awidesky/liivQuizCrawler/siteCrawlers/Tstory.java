@@ -27,7 +27,7 @@ public class Tstory {
 		return getQuiz("KB 스타뱅킹 스타퀴즈");
 	}
 	public static String getKBPayQuizAnswer() {
-		String ret = getQuiz("KB Pay 오늘의 퀴즈");
+		String ret = getQuiz("KB Pay 오늘의 퀴즈", Tstory::QUIZ_DATA);
 		if(ret == null && Main.isDebug()) printAllItems();
 		if(("정답은 " + today + " 10:00시에 오픈합니다.").equals(ret)) {
 			Main.println("Quiz answer not open yet!");
