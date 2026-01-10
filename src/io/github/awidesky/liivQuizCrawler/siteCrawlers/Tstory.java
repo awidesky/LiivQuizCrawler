@@ -24,7 +24,7 @@ public class Tstory {
 		return getQuiz("하나원큐 축구Play 퀴즈HANA", Tstory::QUIZ_DATA);
 	}
 	public static String getKBQuizAnswer() {
-		return getQuiz("KB 스타뱅킹 스타퀴즈");
+		return getQuiz("KB 스타뱅킹 스타퀴즈", Tstory::QUIZ_DATA);
 	}
 	public static String getKBPayQuizAnswer() {
 		String ret = getQuiz("KB Pay 오늘의 퀴즈", Tstory::QUIZ_DATA);
