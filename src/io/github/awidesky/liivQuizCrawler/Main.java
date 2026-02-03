@@ -33,10 +33,10 @@ import io.github.awidesky.liivQuizCrawler.siteCrawlers.Tstory;
 public class Main {
 
 	private static boolean debug = false;
-	private static Object[] oneLiner = new String[6];
+	private static String[] oneLiner = new String[6];
 	private static Consumer<String> out = s -> System.out.print(s);
 	
-	public static final String VERSION = "v2.4";
+	public static final String VERSION = "v2.6";
 	
 	public static void main(String[] args) {
 		
@@ -95,6 +95,7 @@ public class Main {
 		final String today = getDate("M월 d일");
 		println("LiivQuizCrawler " + VERSION);
 		debug("Today : " + today);
+
 		String[] arr = find_quiz("쏠퀴즈", 7);
 		if(arr != null) {
 			for (int i = 1; i < arr.length; i++) {
@@ -111,37 +112,54 @@ public class Main {
 			}
 		}
 		if(oneLiner[0] == null) {
+			println();
 			oneLiner[0] = Tstory.getSOLQuizAnswer();
 		}
 		if(oneLiner[1] == null) {
+			println();
 			oneLiner[1] = Tstory.getSOLBaseballQuizAnswer();
 		}
 		
+
 		println();
+		println("Search CSV file that contains all quiz answers...");
+		Tstory.check_quiz_CSV(List.of("KB Pay 오늘의 퀴즈", "하나원큐 축구Play 퀴즈HANA", "KB 스타뱅킹 스타퀴즈", "기후행동 기회소득 오늘의 퀴즈"),
+				oneLiner, 2);
+		println();
+		
 		List<Supplier<String>> l = List.of(Tstory::getKBPayQuizAnswer, Tipistip::getKBPayQuizAnswer);
-		oneLiner[2] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
-		if (oneLiner[2] == null) {
-			arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
-			if (arr != null) {
-				println(arr[0] + " : " + arr[1]);
-				oneLiner[2] = arr[1];
+		if(oneLiner[2] == null) {
+			println();
+			oneLiner[2] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+			if (oneLiner[2] == null) {
+				arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
+				if (arr != null) {
+					println(arr[0] + " : " + arr[1]);
+					oneLiner[2] = arr[1];
+				}
 			}
 		}
 
-		println();
-		l = List.of(Tstory::getHanaQuizAnswer, Tipistip::getHanaQuizAnswer);
-		oneLiner[3] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
-		
-		println();
-		l = List.of(Tstory::getKBQuizAnswer, Tipistip::getKBQuizAnswer);
-		oneLiner[4] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
-		
-		println();
-		l = List.of(Tstory::getClimateQuizAnswer, Tipistip::getClimateQuizAnswer);
-		oneLiner[5] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
-		
+		if(oneLiner[3] == null) {
+			println();
+			l = List.of(Tipistip::getHanaQuizAnswer, Tstory::getHanaQuizAnswer);
+			oneLiner[3] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+		}
+
+		if(oneLiner[4] == null) {
+			println();
+			l = List.of(Tipistip::getKBQuizAnswer, Tstory::getKBQuizAnswer);
+			oneLiner[4] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+		}
+
+		if(oneLiner[5] == null) {
+			println();
+			l = List.of(Tipistip::getClimateQuizAnswer, Tstory::getClimateQuizAnswer);
+			oneLiner[5] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+		}
+
 		println("\n");
-		printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"  기후 \"%s\"", oneLiner);
+		printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"  기후 \"%s\"", (Object[])oneLiner);
 		println();
 	}
 	
