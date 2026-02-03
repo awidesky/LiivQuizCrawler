@@ -33,7 +33,7 @@ import io.github.awidesky.liivQuizCrawler.siteCrawlers.Tstory;
 public class Main {
 
 	private static boolean debug = false;
-	private static Object[] oneLiner = new String[5];
+	private static Object[] oneLiner = new String[6];
 	private static Consumer<String> out = s -> System.out.print(s);
 	
 	public static final String VERSION = "v2.4";
@@ -136,8 +136,12 @@ public class Main {
 		l = List.of(Tstory::getKBQuizAnswer, Tipistip::getKBQuizAnswer);
 		oneLiner[4] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
 		
+		println();
+		l = List.of(Tstory::getClimateQuizAnswer, Tipistip::getClimateQuizAnswer);
+		oneLiner[5] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+		
 		println("\n");
-		printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"", oneLiner);
+		printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"  기후 \"%s\"", oneLiner);
 		println();
 	}
 	

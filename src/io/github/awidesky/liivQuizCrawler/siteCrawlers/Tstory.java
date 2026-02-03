@@ -20,14 +20,17 @@ public class Tstory {
 	private static final String listLink = "https://bookshelf-journey.tistory.com/category?page=";
 	private static final String today = Main.getDate("M월 d일");
 
+	public static String getClimateQuizAnswer() {
+		return getQuiz("기후행동 기회소득", Tstory::quiz_answer_text);
+	}
 	public static String getHanaQuizAnswer() {
-		return getQuiz("하나원큐 축구Play 퀴즈HANA", Tstory::QUIZ_DATA);
+		return getQuiz("하나원큐 축구Play 퀴즈HANA", Tstory::quiz_answer_text);
 	}
 	public static String getKBQuizAnswer() {
-		return getQuiz("KB 스타뱅킹 스타퀴즈", Tstory::QUIZ_DATA);
+		return getQuiz("KB 스타뱅킹 스타퀴즈", Tstory::quiz_answer_text);
 	}
 	public static String getKBPayQuizAnswer() {
-		String ret = getQuiz("KB Pay 오늘의 퀴즈", Tstory::QUIZ_DATA);
+		String ret = getQuiz("KB Pay 오늘의 퀴즈", Tstory::quiz_answer_text);
 		if(ret == null && Main.isDebug()) printAllItems();
 		if(("정답은 " + today + " 10:00시에 오픈합니다.").equals(ret)) {
 			Main.println("Quiz answer not open yet!");
@@ -149,7 +152,8 @@ public class Tstory {
 		}
 		return null;
 	}
-	
+
+	@SuppressWarnings("unused")
 	private static String QUIZ_DATA(String[] html) {
 		Pattern quizdataPattern = Pattern.compile("^\\s*const QUIZ_DATA = \\{");
 		Pattern pattern = Pattern.compile("answer: \\\"(.*?)\\\",");
@@ -169,10 +173,8 @@ public class Tstory {
 		return null;
 	}
 	
-	@SuppressWarnings("unused")
 	private static String quiz_answer_text(String[] html) {
-		Pattern pattern = Pattern.compile("<div\\s+class=\"quiz-answer-text-area\"\\s*>\\s*"
-				+ "<span\\s+class=\"quiz-answer-text\"\\s*>(.*?)</span>\\s*</div>", Pattern.DOTALL);
+		Pattern pattern = Pattern.compile("<div\\s+class=\"quiz-answer-text-area\"\\s*>\\s*<h3\\s+id=\"dynamic-answer\"\\s+class=\"quiz-answer-text text-size23\"\\s+data-ke-size=\"size23\">(.*?)</h3>\\s*</div>", Pattern.DOTALL);
 		for(int i = 0; i < html.length; i++) {
 			Matcher matcher = pattern.matcher(html[i]);
 			if(matcher.find()) {
@@ -180,7 +182,7 @@ public class Tstory {
 				return matcher.group(1);
 			}
 		}
-		Main.println("Cannot find <div class=\"quiz-answer-text-area\"><span class=\"quiz-answer-text\">(.*?)</span></div>");
+		Main.println("Cannot find " + pattern.pattern());
 	
 		Pattern narrowPattern = Pattern.compile("\"quiz-answer-text\">(.*?)<");
 		Main.debug("Check narrow pattern : " + narrowPattern.pattern());
