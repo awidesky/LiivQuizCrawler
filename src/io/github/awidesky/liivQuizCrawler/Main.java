@@ -36,7 +36,7 @@ public class Main {
 	private static String[] oneLiner = new String[6];
 	private static Consumer<String> out = s -> System.out.print(s);
 	
-	public static final String VERSION = "v2.6";
+	public static final String VERSION = "v2.6.1";
 	
 	public static void main(String[] args) {
 		
@@ -96,37 +96,40 @@ public class Main {
 		println("LiivQuizCrawler " + VERSION);
 		debug("Today : " + today);
 
-		String[] arr = find_quiz("쏠퀴즈", 7);
-		if(arr != null) {
-			for (int i = 1; i < arr.length; i++) {
-				if(arr[i].contains("퀴즈팡팡")) {
-					continue;
-				}
-				if (arr[i].contains("출석퀴즈")) {
-					printf("%s : %s\n", arr[i], arr[i + 1]);
-					oneLiner[0] = arr[i + 1];
-				} else if (arr[i].contains("쏠퀴즈")) {
-					printf("%s : %s\n", arr[i], arr[i + 1]);
-					oneLiner[1] = arr[i + 1];
-				}
-			}
-		}
-		if(oneLiner[0] == null) {
-			println();
-			oneLiner[0] = Tstory.getSOLQuizAnswer();
-		}
-		if(oneLiner[1] == null) {
-			println();
-			oneLiner[1] = Tstory.getSOLBaseballQuizAnswer();
-		}
-		
 
 		println();
 		println("Search CSV file that contains all quiz answers...");
-		Tstory.check_quiz_CSV(List.of("KB Pay 오늘의 퀴즈", "하나원큐 축구Play 퀴즈HANA", "KB 스타뱅킹 스타퀴즈", "기후행동 기회소득 오늘의 퀴즈"),
-				oneLiner, 2);
+		Tstory.check_quiz_CSV(List.of("신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼 SOL 야구/상식 쏠퀴즈", "KB Pay 오늘의 퀴즈", "하나원큐 축구Play 퀴즈HANA",
+				"KB 스타뱅킹 스타퀴즈", "기후행동 기회소득 오늘의 퀴즈"), oneLiner, 0);
 		println();
 		
+		String[] arr;
+		if(oneLiner[0] == null || oneLiner[1] == null) {
+			arr = find_quiz("쏠퀴즈", 7);
+			if(arr != null) {
+				for (int i = 1; i < arr.length; i++) {
+					if(arr[i].contains("퀴즈팡팡")) {
+						continue;
+					}
+					if (arr[i].contains("출석퀴즈")) {
+						printf("%s : %s\n", arr[i], arr[i + 1]);
+						oneLiner[0] = arr[i + 1];
+					} else if (arr[i].contains("쏠퀴즈")) {
+						printf("%s : %s\n", arr[i], arr[i + 1]);
+						oneLiner[1] = arr[i + 1];
+					}
+				}
+			}
+			if(oneLiner[0] == null) {
+				println();
+				oneLiner[0] = Tstory.getSOLQuizAnswer();
+			}
+			if(oneLiner[1] == null) {
+				println();
+				oneLiner[1] = Tstory.getSOLBaseballQuizAnswer();
+			}
+		}
+
 		List<Supplier<String>> l = List.of(Tstory::getKBPayQuizAnswer, Tipistip::getKBPayQuizAnswer);
 		if(oneLiner[2] == null) {
 			println();

@@ -231,7 +231,7 @@ public class Tstory {
 			String line;
 			boolean isHeader = true;
 
-			// CSV 한 줄 파싱 (따옴표, 쉼표 처리 정규식)
+			// CSV parsing regex
 			Pattern pattern = Pattern.compile("(?:^|,)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\",]*))");
 
 			while ((line = br.readLine()) != null) {
@@ -330,8 +330,8 @@ public class Tstory {
 					continue;
 
 				String answer = Main.fixString(columns.size() > 2 ? columns.get(2) : null);
-				Main.println("Found %s : %s".formatted(key, answer));
-				out[index + offset] = answer;
+				Main.println("Found %s : \"%s\"".formatted(key, answer));
+				out[index + offset] = answer.isEmpty() ? null : answer;
 			}
 
 			return true;
