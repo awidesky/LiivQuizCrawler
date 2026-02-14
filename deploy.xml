@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- This script is used to use the application in my personal mac device. -->
+<!-- It wouldn't be usefull for other people. -->
+<project default="create_run_jar" name="Create Runnable Jar for Project LiivQuizCrawler with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR file Export Wizard-->
+    <!--ANT 1.7 is required-->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.jarfile" value="${user.home}/Test/bin"/>
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/livquiz.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="io.github.awidesky.liivQuizCrawler.Main"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="${dir.buildfile}/target/classes"/>
+        </jar>
+    </target>
+</project>
