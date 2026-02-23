@@ -99,7 +99,7 @@ public class Main {
 
 		println();
 		println("Search CSV file that contains all quiz answers...");
-		Tstory.check_quiz_CSV(List.of("신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼 SOL 야구/상식 쏠퀴즈", "KB Pay 오늘의 퀴즈", "하나원큐 축구Play 퀴즈HANA",
+		Tstory.check_quiz_CSV(List.of("신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼SOL 야구/상식 쏠퀴즈", "KB Pay 오늘의 퀴즈", "하나원큐 축구Play 퀴즈HANA",
 				"KB 스타뱅킹 스타퀴즈", "기후행동 기회소득 오늘의 퀴즈"), oneLiner, 0);
 		println();
 		

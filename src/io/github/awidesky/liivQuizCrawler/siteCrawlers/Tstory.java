@@ -265,32 +265,24 @@ public class Tstory {
 	}
 
 	public static void check_quiz_CSV(List<String> searchKeys, String[] out, int offset) {
-		AtomicReference<String[]> ref = new AtomicReference<>();
-		Stream.of("기후행동 기회소득", "하나원큐 축구Play 퀴즈HANA", "KB 스타뱅킹 스타퀴즈", "신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼 SOL 야구/상식 쏠퀴즈",
-				"KB Pay 오늘의 퀴즈").map(title -> getQuiz(title, arr -> {
-					ref.set(arr);
-					return "Visited to acquire quiz CSV file";
+		AtomicReference<String> ref = new AtomicReference<>();
+		Stream.of("하나원큐 축구Play 퀴즈HANA", "KB 스타뱅킹 스타퀴즈", "신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼 SOL 야구/상식 쏠퀴즈",
+				"KB Pay 오늘의 퀴즈", "기후행동 기회소득").map(title -> getQuiz(title, arr -> {
+					Pattern csvUrlPattern = Pattern.compile("const\\s+SHEET_URL\\s*=\\s*\"([^\"]+)\"");
+					for (String line : arr) {
+						Matcher m = csvUrlPattern.matcher(line);
+						if (m.find()) {
+							ref.set(m.group(1));
+							Main.debug("Found csv file link : " + ref.get());
+							return "Visited and found quiz CSV file";
+						}
+					}
+					Main.println(csvUrlPattern.pattern() + " not found!");
+					return null;
 				})).filter(Objects::nonNull).findFirst().orElseGet(null); //TODO : check if null?
 		quiz_fetch_csv_ALL(ref.get(), searchKeys, out, offset);
 	}
-	private static boolean quiz_fetch_csv_ALL(String[] html, List<String> searchKeys, String[] out, int offset) {
-		String csvUrl = null;
-		Pattern csvUrlPattern = Pattern.compile("const\\s+SHEET_URL\\s*=\\s*\"([^\"]+)\"");
-
-		for (String line : html) {
-			Matcher m = csvUrlPattern.matcher(line);
-			if (m.find()) {
-				csvUrl = m.group(1);
-				Main.debug("Found csv file link : " + csvUrl);
-				break;
-			}
-		}
-
-		if (csvUrl == null) {
-			Main.println(csvUrlPattern.pattern() + " not found!");
-			return false;
-		}
-
+	private static boolean quiz_fetch_csv_ALL(String csvUrl, List<String> searchKeys, String[] out, int offset) {
 		// searchKey - index mapping
 		Map<String, Integer> keyIndexMap = new HashMap<>();
 		for (int i = 0; i < searchKeys.size(); i++) {
