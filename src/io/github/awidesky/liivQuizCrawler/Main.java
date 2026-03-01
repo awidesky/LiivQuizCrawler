@@ -255,7 +255,7 @@ public class Main {
 		for(Entry<String, String> e : numbers.entrySet()) {
 			ret = ret.replace(e.getKey(), e.getValue());
 		}
-		return ret;
+		return ret.isEmpty() ? null : ret;
 	}
 	
 	public static void debug(String str) {
