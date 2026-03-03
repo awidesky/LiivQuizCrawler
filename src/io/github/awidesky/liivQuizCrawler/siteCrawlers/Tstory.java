@@ -323,7 +323,7 @@ public class Tstory {
 
 				String answer = Main.fixString(columns.size() > 2 ? columns.get(2) : null);
 				Main.println("Found %s : \"%s\"".formatted(key, answer));
-				out[index + offset] = answer.isEmpty() ? null : answer;
+				out[index + offset] = (answer == null || answer.isEmpty()) ? null : answer;
 			}
 
 			return true;
