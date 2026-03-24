@@ -279,10 +279,14 @@ public class Tstory {
 					}
 					Main.println(csvUrlPattern.pattern() + " not found!");
 					return null;
-				})).filter(Objects::nonNull).findFirst().orElseGet(null); //TODO : check if null?
+				})).filter(Objects::nonNull).findFirst();
 		quiz_fetch_csv_ALL(ref.get(), searchKeys, out, offset);
 	}
 	private static boolean quiz_fetch_csv_ALL(String csvUrl, List<String> searchKeys, String[] out, int offset) {
+		if(csvUrl == null ) {
+			Main.println("csvUrl is null!");
+			return false;
+		}
 		// searchKey - index mapping
 		Map<String, Integer> keyIndexMap = new HashMap<>();
 		for (int i = 0; i < searchKeys.size(); i++) {
