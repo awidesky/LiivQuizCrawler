@@ -130,7 +130,7 @@ public class Main {
 			}
 		}
 
-		List<Supplier<String>> l = List.of(Tstory::getKBPayQuizAnswer, Tipistip::getKBPayQuizAnswer);
+		List<Supplier<String>> l = List.of(Tipistip::getKBPayQuizAnswer, Tstory::getKBPayQuizAnswer);
 		if(oneLiner[2] == null) {
 			println();
 			oneLiner[2] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
@@ -255,7 +255,7 @@ public class Main {
 		for(Entry<String, String> e : numbers.entrySet()) {
 			ret = ret.replace(e.getKey(), e.getValue());
 		}
-		return ret.isEmpty() ? null : ret;
+		return ret.isEmpty() ? null : ret.strip();
 	}
 	
 	public static void debug(String str) {
