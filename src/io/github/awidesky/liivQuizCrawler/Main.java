@@ -52,7 +52,7 @@ public class Main {
 			switch (args[i]) {
 			case "--getText":
 				String link;
-				if (i < args.length)
+				if (i + 1 < args.length)
 					link = args[i + 1];
 				else {
 					print("Enter link to print > ");
