@@ -5,7 +5,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -132,13 +132,18 @@ public class Main {
 
 		List<Supplier<String>> l = List.of(Tipistip::getKBPayQuizAnswer, Tstory::getKBPayQuizAnswer);
 		if(oneLiner[2] == null) {
-			println();
-			oneLiner[2] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
-			if (oneLiner[2] == null) {
-				arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
-				if (arr != null) {
-					println(arr[0] + " : " + arr[1]);
-					oneLiner[2] = arr[1];
+			int hour = Integer.parseInt(getDate("kk"));
+			if(hour < 10) {
+				println("Current time : " + hour + ", not 10AM yet!");
+			} else {
+				println();
+				oneLiner[2] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+				if (oneLiner[2] == null) {
+					arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
+					if (arr != null) {
+						println(arr[0] + " : " + arr[1]);
+						oneLiner[2] = arr[1];
+					}
 				}
 			}
 		}
@@ -280,6 +285,6 @@ public class Main {
 	
 	public static String getDate(String format) {
 		return DateTimeFormatter.ofPattern(format, Locale.ENGLISH)
-					.format(LocalDate.now(ZoneId.of("Asia/Seoul")));
+					.format(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
 	}
 }
