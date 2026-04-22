@@ -19,6 +19,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -34,7 +35,7 @@ public class Tstory {
 		return getQuiz("기후행동 기회소득", Tstory::quiz_fetch_csv);
 	}
 	public static String getHanaQuizAnswer() {
-		return getQuiz("하나원큐 축구Play 퀴즈HANA", Tstory::quiz_fetch_csv);
+		return getQuiz("[하나원큐 축구Play 퀴즈HANA 정답] 퀴즈풀고 원큐볼도 받고", Tstory::quiz_fetch_csv);
 	}
 	public static String getKBQuizAnswer() {
 		return getQuiz("KB 스타뱅킹 스타퀴즈", Tstory::quiz_fetch_csv);
@@ -261,7 +262,7 @@ public class Tstory {
 
 	public static void check_quiz_CSV(List<String> searchKeys, String[] out, int offset) {
 		AtomicReference<String> ref = new AtomicReference<>();
-		Stream.of("하나원큐 축구Play 퀴즈HANA", "KB 스타뱅킹 스타퀴즈", "신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼 SOL 야구/상식 쏠퀴즈",
+		Stream.of("퀴즈풀고 원큐볼도 받고", "KB 스타뱅킹 스타퀴즈", "신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼 SOL 야구/상식 쏠퀴즈",
 				"KB Pay 오늘의 퀴즈", "기후행동 기회소득").map(title -> getQuiz(title, arr -> {
 					Pattern csvUrlPattern = Pattern.compile("const\\s+SHEET_URL\\s*=\\s*\"([^\"]+)\"");
 					for (String line : arr) {
@@ -288,49 +289,72 @@ public class Tstory {
 			keyIndexMap.put(searchKeys.get(i), i);
 		}
 
-		try (BufferedReader br = new BufferedReader(
-				new InputStreamReader(new URL(csvUrl).openStream(), StandardCharsets.UTF_8))) {
-
-			String line;
-			boolean isHeader = true;
-
-			Pattern csvPattern = Pattern.compile("(?:^|,)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\",]*))");
-
-			while ((line = br.readLine()) != null) {
-
-				if (isHeader) {
-					isHeader = false;
-					continue;
-				}
-
-				List<String> columns = new ArrayList<>();
-				Matcher matcher = csvPattern.matcher(line);
-
-				while (matcher.find()) {
-					String value = matcher.group(1) != null ? matcher.group(1).replace("\"\"", "\"") : matcher.group(2);
-					columns.add(value != null ? value.trim() : "");
-				}
-
-				if (columns.isEmpty())
-					continue;
-
-				// desired searchKey?
-				String key = columns.get(0);
-				Integer index = keyIndexMap.get(key);
-				if (index == null)
-					continue;
-
-				String answer = Main.fixString(columns.size() > 2 ? columns.get(2) : null);
-				Main.println("Found %s : \"%s\"".formatted(key, answer));
-				out[index + offset] = (answer == null || answer.isEmpty()) ? null : answer;
-			}
-
-			return true;
+		List<List<String>> parsedRows = null; 
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(new URL(csvUrl).openStream(), StandardCharsets.UTF_8))) {
+			parsedRows = parseCSV(br.lines().collect(Collectors.joining("\n")));
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			Main.println(sw.toString());
 			return false;
 		}
+
+		for (int i = 1; i < parsedRows.size(); i++) { // header skip
+			List<String> row = parsedRows.get(i);
+			if (row.size() <= 2) continue;
+
+			String question = row.get(0);
+			Integer index = keyIndexMap.get(question.trim());
+			if (index == null) continue;
+
+			String answer = Main.fixString(row.get(2));
+			Main.println("Found %s : \"%s\"".formatted(question, answer));
+			out[index + offset] = (answer == null || answer.isEmpty()) ? null : answer;
+		}
+		return true;
+	}
+	
+	private static List<List<String>> parseCSV(String csvText) {
+	    List<List<String>> rows = new ArrayList<>();
+	    List<String> currentRow = new ArrayList<>();
+	    StringBuilder currentVal = new StringBuilder();
+
+	    boolean insideQuote = false;
+
+	    for (int i = 0; i < csvText.length(); i++) {
+	        char c = csvText.charAt(i);
+	        char next = (i + 1 < csvText.length()) ? csvText.charAt(i + 1) : '\0';
+
+	        if (c == '"') {
+	            if (insideQuote && next == '"') {
+	                currentVal.append('"');
+	                i++;
+	            } else {
+	                insideQuote = !insideQuote;
+	            }
+	        }
+	        else if (c == ',' && !insideQuote) {
+	            currentRow.add(currentVal.toString());
+	            currentVal.setLength(0);
+	        }
+	        else if ((c == '\n' || c == '\r') && !insideQuote) {
+	            if (c == '\r' && next == '\n') i++;
+	            currentRow.add(currentVal.toString());
+	            rows.add(currentRow);
+
+	            currentRow = new ArrayList<>();
+	            currentVal.setLength(0);
+	        }
+	        else {
+	            currentVal.append(c);
+	        }
+	    }
+
+	    if (currentVal.length() > 0 || !currentRow.isEmpty()) {
+	        currentRow.add(currentVal.toString());
+	        rows.add(currentRow);
+	    }
+
+	    return rows;
 	}
 }

@@ -36,7 +36,7 @@ public class Main {
 	private static String[] oneLiner = new String[6];
 	private static Consumer<String> out = s -> System.out.print(s);
 	
-	public static final String VERSION = "v2.6.1";
+	public static final String VERSION = "v2.6.3";
 	
 	public static void main(String[] args) {
 		
@@ -134,7 +134,7 @@ public class Main {
 		if(oneLiner[2] == null) {
 			int hour = Integer.parseInt(getDate("kk"));
 			if(hour < 10) {
-				println("Current time : " + hour + ", not 10AM yet!");
+				println("Skip KBPay - Current time : " + hour + ", not 10AM yet!");
 			} else {
 				println();
 				oneLiner[2] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
