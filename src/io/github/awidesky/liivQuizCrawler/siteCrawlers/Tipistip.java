@@ -26,6 +26,12 @@ public class Tipistip {
 	public static String getKBPayQuizAnswer() {
 		return getQuiz("리브메이트 퀴즈] 오늘의 퀴즈 (KB Pay 앱으로 통합)");
 	}
+	public static String getSOLQuizAnswer() {
+		return getQuiz("신한페이판 출석퀴즈] 신한 슈퍼 SOL 출석퀴즈 (퀴즈위치 -&gt; 신한 슈퍼 SOL -&gt; 혜택 -&gt; 출석퀴즈)");
+	}
+	public static String getSOLBaseballQuizAnswer() {
+		return getQuiz("신한 쏠야구퀴즈] 오늘의 문제 (신한쏠 앱 &gt; 혜택 &gt; 야구 오늘의 Quiz)");
+	}
 
 	private static String getQuiz(String title) {
 		Pattern linkPattern = Pattern.compile(".*<a href=\\\"(.*?)\\\">.*");

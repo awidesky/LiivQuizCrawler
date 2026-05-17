@@ -39,6 +39,7 @@ public class Main {
 	public static final String VERSION = "v2.6.3";
 	
 	public static void main(String[] args) {
+		boolean skipCSV = false;
 		
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
 			println();
@@ -83,6 +84,10 @@ public class Main {
 				f.setVisible(true);
 				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				break;
+
+			case "--skipCSV":
+				skipCSV = true;
+				break;
 				
 			default:
 				System.err.println("Unknown option : " + args[i]);
@@ -98,10 +103,12 @@ public class Main {
 
 
 		println();
-		println("Search CSV file that contains all quiz answers...");
-		Tstory.check_quiz_CSV(List.of("신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼SOL 야구/상식 쏠퀴즈", "KB Pay 오늘의 퀴즈", "하나원큐 축구Play 퀴즈HANA",
-				"KB 스타뱅킹 스타퀴즈", "기후행동 기회소득 오늘의 퀴즈"), oneLiner, 0);
-		println();
+		if(!skipCSV) {
+			println("Search CSV file that contains all quiz answers...");
+			Tstory.check_quiz_CSV(List.of("신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼SOL 야구/상식 쏠퀴즈", "KB Pay 오늘의 퀴즈", "하나원큐 축구Play 퀴즈HANA",
+					"KB 스타뱅킹 스타퀴즈", "기후행동 기회소득 오늘의 퀴즈"), oneLiner, 0);
+			println();
+		}
 		
 		String[] arr;
 		if(oneLiner[0] == null || oneLiner[1] == null) {
@@ -120,24 +127,24 @@ public class Main {
 					}
 				}
 			}
-			if(oneLiner[0] == null) {
-				println();
-				oneLiner[0] = Tstory.getSOLQuizAnswer();
-			}
-			if(oneLiner[1] == null) {
-				println();
-				oneLiner[1] = Tstory.getSOLBaseballQuizAnswer();
-			}
 		}
 
-		List<Supplier<String>> l = List.of(Tipistip::getKBPayQuizAnswer, Tstory::getKBPayQuizAnswer);
+		if(oneLiner[0] == null) {
+			println();
+			oneLiner[0] = getFirstFromSuppliers(Tipistip::getSOLQuizAnswer, Tstory::getSOLQuizAnswer);
+		}
+		if(oneLiner[1] == null) {
+			println();
+			oneLiner[1] = getFirstFromSuppliers(Tipistip::getSOLBaseballQuizAnswer, Tstory::getSOLBaseballQuizAnswer);
+		}
+		
 		if(oneLiner[2] == null) {
 			int hour = Integer.parseInt(getDate("kk"));
 			if(hour < 10) {
 				println("Skip KBPay - Current time : " + hour + ", not 10AM yet!");
 			} else {
 				println();
-				oneLiner[2] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+				oneLiner[2] = getFirstFromSuppliers(Tipistip::getKBPayQuizAnswer, Tstory::getKBPayQuizAnswer);
 				if (oneLiner[2] == null) {
 					arr = find_quiz("KB Pay 리브메이트 오늘의 퀴즈 정답 " + today.replace(" ", ""), 2);
 					if (arr != null) {
@@ -150,25 +157,27 @@ public class Main {
 
 		if(oneLiner[3] == null) {
 			println();
-			l = List.of(Tipistip::getHanaQuizAnswer, Tstory::getHanaQuizAnswer);
-			oneLiner[3] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+			oneLiner[3] = getFirstFromSuppliers(Tipistip::getHanaQuizAnswer, Tstory::getHanaQuizAnswer);
 		}
 
 		if(oneLiner[4] == null) {
 			println();
-			l = List.of(Tipistip::getKBQuizAnswer, Tstory::getKBQuizAnswer);
-			oneLiner[4] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+			oneLiner[4] = getFirstFromSuppliers(Tipistip::getKBQuizAnswer, Tstory::getKBQuizAnswer);
 		}
 
 		if(oneLiner[5] == null) {
 			println();
-			l = List.of(Tipistip::getClimateQuizAnswer, Tstory::getClimateQuizAnswer);
-			oneLiner[5] = l.stream().map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
+			oneLiner[5] = getFirstFromSuppliers(Tipistip::getClimateQuizAnswer, Tstory::getClimateQuizAnswer);
 		}
 
 		println("\n");
 		printf("신한 \"%s\"  \"%s\"  리브 \"%s\"  하나 \"%s\"  KB \"%s\"  기후 \"%s\"", (Object[])oneLiner);
 		println();
+	}
+	
+	@SafeVarargs
+	private static String getFirstFromSuppliers(Supplier<String>... supp) {
+		return Arrays.stream(supp).map(Supplier::get).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 	
 	private static final String newsList = "https://www.bntnews.co.kr/article/list/bnt005005000"; 
