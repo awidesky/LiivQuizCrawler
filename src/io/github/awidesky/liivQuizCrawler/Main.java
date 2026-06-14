@@ -88,12 +88,35 @@ public class Main {
 			case "--skipCSV":
 				skipCSV = true;
 				break;
-				
+
+			case "--help":
+			case "-h":
+				println("LiivQuizCrawler " + VERSION);
+				println();
+				println("Usage:");
+				println(" java -jar LiivQuizCrawler.jar [options]");
+				println();
+				println("Options:");
+				println(" --help, -h");
+				println(" Show this help message.");
+				println();
+				println(" --getText <url>");
+				println(" Extract and print text from the specified URL.");
+				println(" If <url> is omitted, it will be requested interactively.");
+				println();
+				println(" --debug");
+				println(" Enable debug vebose output.");
+				println();
+				println(" --gui");
+				println(" Start with GUI console window.");
+				println();
+				println(" --skipCSV");
+				println(" Skip Tstory quiz CSV check");
 			default:
-				System.err.println("Unknown option : " + args[i]);
+				println("Unknown option : " + args[i]);
 				break;
 			}
-			
+
 		}
 		
 		
