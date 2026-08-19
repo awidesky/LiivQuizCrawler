@@ -218,8 +218,10 @@ public class Tstory {
 				Main.debug("Found csv file link : " + csvUrl);
 			} 
 		}
-		if(csvUrl == null || searchKey == null)
+		if(csvUrl == null || searchKey == null) {
 			Main.println("csvUrl = %s, seachKey = %s".formatted(csvUrl, searchKey));
+			return null;
+		}
 
 		try (BufferedReader br = new BufferedReader(
 				new InputStreamReader(new URL(csvUrl).openStream(), StandardCharsets.UTF_8))) {
