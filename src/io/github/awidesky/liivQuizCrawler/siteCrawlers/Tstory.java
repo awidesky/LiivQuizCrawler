@@ -65,7 +65,7 @@ public class Tstory {
 
 	private static Pattern linkPatten = Pattern.compile("\"item\":\\{\"@id\":\"(.*?)\",\"name\":\"(.*?)\\}");
 	private static Stream<String> getQuizTitleMatchers(Predicate<Matcher> p, Function<Matcher, String> mapper) {
-		return IntStream.range(1, 5).mapToObj(i -> HTML.getText(listLink + 1)).flatMap(Arrays::stream).map(linkPatten::matcher)
+		return IntStream.range(1, 5).mapToObj(i -> HTML.getText(listLink + i)).flatMap(Arrays::stream).map(linkPatten::matcher)
 				.map(m -> {
 					List<String> l = new LinkedList<>();
 					while(m.find()) {
