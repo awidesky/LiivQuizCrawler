@@ -61,8 +61,13 @@ public class Main {
 					link = sc.nextLine();
 					sc.close();
 				}
-				for (String s : HTML.getText(link))
-					println(s);
+				String[] text = HTML.getText(link);
+				if(text == null) {
+					println("Failed to fetch : " + link);
+				} else {
+					for (String s : text)
+						println(s);
+				}
 				return;
 				
 			case "--debug":
@@ -137,16 +142,20 @@ public class Main {
 		if(oneLiner[0] == null || oneLiner[1] == null) {
 			arr = find_quiz("쏠퀴즈", 7);
 			if(arr != null) {
-				for (int i = 1; i < arr.length; i++) {
+				for (int i = 1; i < arr.length - 1; i++) {
 					if(arr[i].contains("퀴즈팡팡")) {
 						continue;
 					}
 					if (arr[i].contains("출석퀴즈")) {
-						printf("%s : %s\n", arr[i], arr[i + 1]);
-						oneLiner[0] = arr[i + 1];
+						if(!arr[i + 1].isEmpty()) {
+							printf("%s : %s\n", arr[i], arr[i + 1]);
+							oneLiner[0] = arr[i + 1];
+						}
 					} else if (arr[i].contains("쏠퀴즈")) {
-						printf("%s : %s\n", arr[i], arr[i + 1]);
-						oneLiner[1] = arr[i + 1];
+						if(!arr[i + 1].isEmpty()) {
+							printf("%s : %s\n", arr[i], arr[i + 1]);
+							oneLiner[1] = arr[i + 1];
+						}
 					}
 				}
 			}

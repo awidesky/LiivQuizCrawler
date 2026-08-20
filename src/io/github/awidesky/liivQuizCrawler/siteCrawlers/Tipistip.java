@@ -38,6 +38,10 @@ public class Tipistip {
 		String link = IntStream.range(1, 5).mapToObj(i -> listLink + i)
 				.map(li -> {
 					String arr[] = HTML.getText(li);
+					if(arr == null) {
+						Main.println("Failed to load : " + li);
+						return null;
+					}
 					for(int i = 0; i < arr.length; i++) {
 						if(arr[i].contains(title)) {
 							String s = arr[i-1].replace("&amp;", "&");
@@ -67,6 +71,10 @@ public class Tipistip {
 			});
 			Main.println(t + " : " + HTML.encodeURL(link));
 			Main.debug("Raw url : " + link);
+			if(t == null) {
+				Main.println("Cannot load title of : " + link);
+				return null;
+			}
 			if(!t.contains(today)) {
 				Main.println("!!!Wrong Title!!! : " + t);
 				Main.println("!!!Should contain : " + today);
@@ -106,7 +114,7 @@ public class Tipistip {
 		Main.println("Cannot find content " + pattern + " after finding " + startPattern);
 		for(int j = i; j < i + 5 && j < html.length; j++) {
 				Main.debug("[" + j + "] " + html[j]);
-				if(html[i].contains("본문 내용 끝")) break;
+				if(html[j].contains("본문 내용 끝")) break;
 		}
 		return null;
 	}

@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +33,7 @@ public class HTML {
 		return getTextFilterFirstOptional(url, map).orElse(null);
 	}
 	public static String[] getTextUntilFind(String url, String str) {
-		return openURLconnection(url, l -> l.takeWhile(s -> s.contains(str)).toArray(String[]::new));
+		return openURLconnection(url, l -> l.takeWhile(s -> !s.contains(str)).toArray(String[]::new));
 	}
 	
 	public static String encodeURL(String link) {
@@ -41,7 +42,19 @@ public class HTML {
 
 	
 	private static <T> T openURLconnection(String url, Function<Stream<String>, T> f) {
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(new URL(url).openConnection().getInputStream(), htmlCharset))) {
+		URLConnection conn;
+		try {
+			conn = new URL(url).openConnection();
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
+			conn.setConnectTimeout(10_000);
+			conn.setReadTimeout(10_000);
+		} catch (IOException e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			Main.println(sw.toString());
+			return null;
+		}
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), htmlCharset))) {
 			return f.apply(br.lines());
 		} catch (IOException e) {
 			StringWriter sw = new StringWriter();

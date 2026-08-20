@@ -94,7 +94,11 @@ public class Tstory {
 				if(m.find()) return m.group(1);
 				else return null;
 			});
-			Main.println(t + " : " + HTML.encodeURL(link));
+			if(t != null) {
+				Main.println(t + " : " + HTML.encodeURL(link));
+			} else {
+				Main.println("Failed to load title for : " + HTML.encodeURL(link));
+			}
 			Main.debug("Raw url : " + link);
 			ret = getQuizAnswer(link, finder);
 			if(ret != null) ret = ret.strip();
@@ -106,6 +110,10 @@ public class Tstory {
 	
 	private static String getQuizAnswer(String link, Function<String[], String> finder) {
 		String[] html = HTML.getText(link);
+		if(html == null) {
+			Main.println("Failed to load article : " + link);
+			return null;
+		}
 		Main.debug("HTML for quiz loaded, lines : " + html.length + ", approx bytes : " + Arrays.stream(html).parallel().mapToInt(s -> s.length() * 2).sum());
 		
 		String ret = finder.apply(html);
@@ -251,14 +259,12 @@ public class Tstory {
 				}
 			}
 
-			br.close();
-
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			Main.println(sw.toString());
 		}
-		Main.println("%s not found in : ".formatted(searchKey, csvUrl));
+		Main.println("%s not found in : %s".formatted(searchKey, csvUrl));
 		return null;
 	}
 
