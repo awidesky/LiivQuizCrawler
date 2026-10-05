@@ -30,12 +30,13 @@ public class Tstory {
 
 	private static final String listLink = "https://bookshelf-journey.tistory.com/category?page=";
 	private static final String today = Main.getDate("M월 d일");
+	private static final Pattern CSV_URL_PATTERN = Pattern.compile("(?:const\\s+SHEET_URL\\s*=\\s*|sheetUrl\\s*:\\s*)\"([^\"]+)\"");
 
 	public static String getClimateQuizAnswer() {
 		return getQuiz("기후행동 기회소득", Tstory::quiz_fetch_csv);
 	}
 	public static String getHanaQuizAnswer() {
-		return getQuiz("[하나원큐 축구Play 퀴즈HANA 정답] 퀴즈풀고 원큐볼도 받고", Tstory::quiz_fetch_csv);
+		return getQuiz("하나원큐 축구Play 퀴즈HANA 정답", Tstory::quiz_fetch_csv);
 	}
 	public static String getKBQuizAnswer() {
 		return getQuiz("KB 스타뱅킹 스타퀴즈", Tstory::quiz_fetch_csv);
@@ -50,7 +51,7 @@ public class Tstory {
 		return ret;
 	}
 	public static String getSOLQuizAnswer() {
-		return getQuiz("신한 슈퍼 SOL 출석 퀴즈");
+		return getQuiz("SOL 출석 퀴즈");
 	}
 	public static String getSOLBaseballQuizAnswer() {
 		return getQuiz("신한 슈퍼 SOL 야구/상식 쏠퀴즈");
@@ -154,6 +155,13 @@ public class Tstory {
 				}
 			}
 		}
+		// V11.4 fallback: <p id="dynamic-answer" ...><span>정답</span></p>
+		Matcher np = Pattern.compile("id=\"dynamic-answer\"[^>]*>\\s*(.*?)\\s*</(?:p|h3)>", Pattern.DOTALL)
+				.matcher(String.join("\n", html));
+		if (np.find()) {
+			String val = np.group(1).replaceAll("<(.*?)>", "").strip();
+			if (!val.isEmpty() && !val.contains("확인하고 있습니다")) return val;
+		}
 		Main.println("Cannot find title " + titlePattern);
 		if(Main.isDebug()) {
 			Main.debug("All blockquotes :");
@@ -212,10 +220,9 @@ public class Tstory {
 	
 	private static String quiz_fetch_csv(String[] html) {
 		String csvUrl = null, searchKey = null;
-		Pattern csvUrlPattern = Pattern.compile("const\\s+SHEET_URL\\s*=\\s*\"([^\"]+)\"");
-		Pattern seachKeyPattern = Pattern.compile("const\\s+SEARCH_KEY\\s*=\\s*\"([^\"]+)\"");
+		Pattern seachKeyPattern = Pattern.compile("(?:const\\s+SEARCH_KEY\\s*=\\s*|sheetKeys\\s*:\\s*\\[\\s*)\"([^\"]+)\"");
 		for(int i = 0; i < html.length; i++) {
-			Matcher csvUrlMatcher = csvUrlPattern.matcher(html[i]);
+			Matcher csvUrlMatcher = CSV_URL_PATTERN.matcher(html[i]);
 			Matcher seachKeyMatcher = seachKeyPattern.matcher(html[i]);
 			if(seachKeyMatcher.find()) {
 				searchKey = seachKeyMatcher.group(1);
@@ -270,18 +277,17 @@ public class Tstory {
 
 	public static void check_quiz_CSV(List<String> searchKeys, String[] out, int offset) {
 		AtomicReference<String> ref = new AtomicReference<>();
-		Stream.of("퀴즈풀고 원큐볼도 받고", "KB 스타뱅킹 스타퀴즈", "신한 슈퍼 SOL 출석 퀴즈", "신한 슈퍼 SOL 야구/상식 쏠퀴즈",
-				"KB Pay 오늘의 퀴즈", "기후행동 기회소득").map(title -> getQuiz(title, arr -> {
-					Pattern csvUrlPattern = Pattern.compile("const\\s+SHEET_URL\\s*=\\s*\"([^\"]+)\"");
+		Stream.of("하나원큐 축구Play 퀴즈HANA 정답", "KB 스타뱅킹 스타퀴즈", "SOL 출석 퀴즈", "신한 슈퍼 SOL 야구/상식 쏠퀴즈",
+						"KB Pay 오늘의 퀴즈", "기후행동 기회소득").map(title -> getQuiz(title, arr -> {
 					for (String line : arr) {
-						Matcher m = csvUrlPattern.matcher(line);
+						Matcher m = CSV_URL_PATTERN.matcher(line);
 						if (m.find()) {
 							ref.set(m.group(1));
 							Main.debug("Found csv file link : " + ref.get());
 							return "Visited and found quiz CSV file";
 						}
 					}
-					Main.println(csvUrlPattern.pattern() + " not found!");
+					Main.println(CSV_URL_PATTERN.pattern() + " not found!");
 					return null;
 				})).filter(Objects::nonNull).findFirst();
 		quiz_fetch_csv_ALL(ref.get(), searchKeys, out, offset);
