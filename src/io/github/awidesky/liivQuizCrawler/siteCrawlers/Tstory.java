@@ -218,6 +218,15 @@ public class Tstory {
 				.findAny().orElse(null);
 	}
 	
+	/** @return true if the row's verified_date is today, format yyyy.MM.dd */
+	private static boolean isVerifiedToday(List<String> columns) {
+		final int CSV_VERIFIED_DATE_COL = 7;
+		String verified = columns.size() > CSV_VERIFIED_DATE_COL ? columns.get(CSV_VERIFIED_DATE_COL).trim() : "";
+		String todayStr = Main.getDate("yyyy.MM.dd");
+		if (todayStr.equals(verified)) return true;
+		Main.println("Skip \"%s\" - verified_date is \"%s\", not today(%s)".formatted(columns.get(0), verified, todayStr));
+		return false;
+	}
 	private static String quiz_fetch_csv(String[] html) {
 		String csvUrl = null, searchKey = null;
 		Pattern seachKeyPattern = Pattern.compile("(?:const\\s+SEARCH_KEY\\s*=\\s*|sheetKeys\\s*:\\s*\\[\\s*)\"([^\"]+)\"");
@@ -262,6 +271,7 @@ public class Tstory {
 				}
 
 				if (!columns.isEmpty() && columns.get(0).equals(searchKey)) {
+					if (!isVerifiedToday(columns)) return null;
 					return Main.fixString(columns.size() > 2 ? columns.get(2) : null);
 				}
 			}
@@ -320,6 +330,7 @@ public class Tstory {
 			String question = row.get(0);
 			Integer index = keyIndexMap.get(question.trim());
 			if (index == null) continue;
+			if (!isVerifiedToday(row)) continue;
 
 			String answer = Main.fixString(row.get(2));
 			Main.println("Found %s : \"%s\"".formatted(question, answer));
