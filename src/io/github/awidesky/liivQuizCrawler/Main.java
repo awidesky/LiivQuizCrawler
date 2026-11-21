@@ -117,6 +117,8 @@ public class Main {
 				println();
 				println(" --skipCSV");
 				println(" Skip Tstory quiz CSV check");
+				return;
+
 			default:
 				println("Unknown option : " + args[i]);
 				break;
